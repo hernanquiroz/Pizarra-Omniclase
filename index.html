@@ -6,8 +6,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1115">
-<meta name="author" content="OmniClase">
-<meta name="robots" content="noindex, nofollow, noarchive">
 <title>Pizarra OmniClase</title>
 <style>
   :root{
@@ -31,9 +29,7 @@
     --border:rgba(255,255,255,.12); --shadow:0 6px 24px rgba(0,0,0,.5);
   }
   *{margin:0;padding:0;box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
-    -webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;
-    -webkit-touch-callout:none;}
+    -webkit-tap-highlight-color:transparent;}
   html,body{
     height:100%;width:100%;overflow:hidden;overscroll-behavior:none;
     font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -140,29 +136,6 @@
   #transcript h4{font-size:var(--fs-small);opacity:.6;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
   #transcript p{margin:4px 0;line-height:1.4;}
 
-  #watermark{
-    position:fixed;inset:0;z-index:15;pointer-events:none;
-    display:flex;align-items:center;justify-content:center;
-    font-size:clamp(40px, 8vw, 200px);
-    color:rgba(127,127,127,.06);
-    font-weight:900;letter-spacing:.1em;
-    transform:rotate(-25deg);
-    user-select:none;
-  }
-
-  #lockScreen{
-    position:fixed;inset:0;z-index:9999;display:none;
-    background:var(--bg);color:var(--fg);
-    align-items:center;justify-content:center;text-align:center;
-    padding:20px;font-size:var(--fs-ui);
-  }
-  #lockScreen.on{display:flex;}
-  #lockScreen div{max-width:520px;line-height:1.6;}
-  #lockScreen button{
-    margin-top:16px;padding:10px 22px;font-size:var(--fs-ui);
-    background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer;
-  }
-
   @media (max-width:640px){
     #toolbar{gap:3px;padding:4px;}
     #toolbar .group{padding-right:3px;}
@@ -179,11 +152,9 @@
   }
   @media (min-width:2200px){
     #toolbar{max-width:90vw;margin:0 auto;left:5vw;right:5vw;}
-    #watermark{font-size:clamp(120px, 12vw, 320px);}
   }
   @media (min-width:3600px){
     #toolbar{max-width:80vw;left:10vw;right:10vw;padding:calc(var(--pad-ui)*1.4);}
-    #watermark{font-size:clamp(200px, 14vw, 480px);}
   }
   @supports (padding:env(safe-area-inset-top)){
     #toolbar{margin-top:var(--safe-t);}
@@ -201,7 +172,6 @@
 </head>
 <body>
 <canvas id="board"></canvas>
-<div id="watermark" aria-hidden="true">OMNICLASE</div>
 
 <button id="menuToggle" title="Menú">☰</button>
 
@@ -266,58 +236,20 @@
 <div id="transcript"><h4>Transcripción</h4><div id="transcriptBody"></div></div>
 <input type="file" id="fileInput" accept=".json" style="display:none">
 
-<div id="lockScreen"><div>
-  <h2>⚠️ Contenido protegido</h2>
-  <p>Se ha detectado una herramienta de inspección abierta. Cierra las herramientas de desarrollador para continuar usando <b>OmniClase</b>.</p>
-  <p style="opacity:.7;margin-top:8px;font-size:.9em">Si esto es un error, pulsa el botón o presiona <b>Esc</b>.</p>
-  <button id="unlockBtn">Desbloquear manualmente</button>
-  <p style="opacity:.6;margin-top:20px;font-size:.85em">© OmniClase · Todos los derechos reservados</p>
-</div></div>
-
 <script>
-/* =============================================================
-   © OMNICLASE — Todos los derechos reservados
-   ============================================================= */
 (function(){
 'use strict';
 
 /* ============================================================
-   ⚙️  CONFIGURACIÓN DE PROTECCIÓN
+   ⚙️  CONFIGURACIÓN
+   ------------------------------------------------------------
+   Todas las protecciones están APAGADAS para garantizar que
+   funcione en GitHub Pages, Netlify, Vercel, local, etc.
+   Cambia a `true` si quieres activarlas.
    ============================================================ */
-const DOMINIOS_AUTORIZADOS = [];  // vacío = sin restricción de dominio
+const BLOQUEAR_CLIC_DERECHO = false;
+const BLOQUEAR_ATAJOS       = false;
 
-const BLOQUEAR_CLIC_DERECHO = true;
-const BLOQUEAR_DEVTOOLS      = true;   // ahora con detección corregida
-const BLOQUEAR_ATAJOS        = true;
-const MOSTRAR_MARCA_AGUA     = true;
-
-/* ============================================================
-   VERIFICACIÓN DE DOMINIO — desactivada si la lista está vacía
-   ============================================================ */
-(function checkDominio(){
-  if (DOMINIOS_AUTORIZADOS.length === 0) return;
-  const host = location.hostname;
-  if (!DOMINIOS_AUTORIZADOS.includes(host)){
-    document.documentElement.innerHTML =
-      '<head><meta charset="utf-8"><title>Acceso bloqueado</title></head>' +
-      '<body style="margin:0;display:flex;align-items:center;justify-content:center;' +
-      'min-height:100vh;font-family:system-ui,sans-serif;background:#0f1115;color:#f2f2f2;text-align:center;padding:24px">' +
-      '<div style="max-width:560px;line-height:1.7">' +
-      '<div style="font-size:64px;margin-bottom:12px">🔒</div>' +
-      '<h1 style="margin:0 0 12px;font-size:26px">Acceso no autorizado</h1>' +
-      '<p>Esta copia de <b>OmniClase</b> no está licenciada para el dominio:</p>' +
-      '<p style="background:#ffffff10;padding:10px 16px;border-radius:10px;display:inline-block;' +
-      'font-family:monospace;margin:12px 0">' + host + '</p>' +
-      '<p style="opacity:.6;font-size:13px;margin-top:20px">' +
-      '© OmniClase · Todos los derechos reservados</p>' +
-      '</div></body>';
-    throw new Error('Dominio no autorizado: ' + host);
-  }
-})();
-
-/* ============================================================
-   BLOQUEO DE CLIC DERECHO Y SELECCIÓN
-   ============================================================ */
 if (BLOQUEAR_CLIC_DERECHO){
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('dragstart',   e => e.preventDefault());
@@ -328,9 +260,6 @@ if (BLOQUEAR_CLIC_DERECHO){
   document.addEventListener('cut',  e => e.preventDefault());
 }
 
-/* ============================================================
-   BLOQUEO DE ATAJOS DE DEVTOOLS
-   ============================================================ */
 if (BLOQUEAR_ATAJOS){
   document.addEventListener('keydown', e => {
     if (e.key === 'F12'){ e.preventDefault(); return false; }
@@ -341,102 +270,14 @@ if (BLOQUEAR_ATAJOS){
     if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')){
       e.preventDefault(); return false;
     }
-    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')){
-      e.preventDefault(); return false;
-    }
   }, true);
 }
 
 /* ============================================================
-   DETECCIÓN DE DEVTOOLS — VERSIÓN CORREGIDA
-   ------------------------------------------------------------
-   Problema anterior: usaba solo outerWidth-innerWidth que da
-   falsos positivos en GitHub Pages, móviles, iframes y zoom.
-   
-   Solución:
-   - Solo se activa en navegadores de escritorio reales
-   - Requiere que AMBAS dimensiones sean sospechosas a la vez
-   - Ignora móviles y tablets (touch)
-   - Ignora si la página está en un iframe
-   - Requiere 3 detecciones consecutivas para bloquear
-   - Botón + tecla Esc para desbloquear manualmente
+   APLICACIÓN
    ============================================================ */
-if (BLOQUEAR_DEVTOOLS){
-  const lockScreen = document.getElementById('lockScreen');
-  const unlockBtn  = document.getElementById('unlockBtn');
-
-  // Si es móvil/tablet o estamos en iframe → no hacer detección
-  const esMovil = /Mobi|Android|iPhone|iPad|iPod|Tablet/i.test(navigator.userAgent)
-                  || ('ontouchstart' in window && navigator.maxTouchPoints > 1);
-  const enIframe = window.self !== window.top;
-  const desbloqueadoManual = { valor:false };
-
-  // Botón de desbloqueo manual
-  unlockBtn.addEventListener('click', () => {
-    desbloqueadoManual.valor = true;
-    lockScreen.classList.remove('on');
-  });
-  // Tecla Esc para desbloquear
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && lockScreen.classList.contains('on')){
-      desbloqueadoManual.valor = true;
-      lockScreen.classList.remove('on');
-    }
-  });
-
-  if (!esMovil && !enIframe){
-    let contadorSospechoso = 0;
-    const check = () => {
-      if (desbloqueadoManual.valor) return;
-
-      const wDelta = window.outerWidth  - window.innerWidth;
-      const hDelta = window.outerHeight - window.innerHeight;
-
-      // Umbral alto + AMBAS dimensiones deben superarlo
-      const umbral = 250;
-      const sospechoso = wDelta > umbral && hDelta > umbral;
-
-      if (sospechoso){
-        contadorSospechoso++;
-        // Requiere 3 detecciones seguidas (~4.5s) para bloquear
-        if (contadorSospechoso >= 3){
-          lockScreen.classList.add('on');
-        }
-      } else {
-        contadorSospechoso = 0;
-        lockScreen.classList.remove('on');
-      }
-    };
-    setInterval(check, 1500);
-  }
-
-  // Trampa para quien intente imprimir en consola
-  const trampa = /./;
-  trampa.toString = function(){
-    if (!desbloqueadoManual.valor) lockScreen.classList.add('on');
-    return '';
-  };
-  try { console.log('%c', trampa); } catch(e){}
-}
-
-/* ============================================================
-   MARCA DE AGUA
-   ============================================================ */
-if (!MOSTRAR_MARCA_AGUA){
-  const wm = document.getElementById('watermark');
-  if (wm) wm.remove();
-}
-
-/* ============================================================
-   OFUSCACIÓN BÁSICA
-   ============================================================ */
-const _0x1a = 'board', _0x2b = 'getContext', _0x3c = '2d';
-
-/* ============================================================
-   APLICACIÓN PRINCIPAL
-   ============================================================ */
-const canvas = document.getElementById(_0x1a);
-const ctx = canvas[_0x2b](_0x3c);
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('status');
 const transcriptEl = document.getElementById('transcript');
 const transcriptBody = document.getElementById('transcriptBody');
@@ -935,11 +776,6 @@ loadAutosave();
 updatePageLabel();
 setTool('pen');
 resize();
-
-/* ---------- MARCAS INVISIBLES ---------- */
-const FIRMA = '©OmniClase-' + btoa(location.hostname + '|' + Date.now()).slice(0,16);
-try { localStorage.setItem('_omniclase_sig', FIRMA); } catch(_){}
-Object.defineProperty(window, '_omniclase', { value: FIRMA, writable:false });
 
 })();
 </script>

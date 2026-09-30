@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -279,25 +278,11 @@
 /* ============================================================
    ⚙️  CONFIGURACIÓN DE PROTECCIÓN
    ============================================================
-   👉 CAMBIA ESTA LISTA por TUS dominios reales.
-      Ejemplos:
-        - GitHub Pages:  'tuusuario.github.io'
-        - Netlify:       'tuapp.netlify.app'
-        - Vercel:        'tuapp.vercel.app'
-        - Dominio propio:'tudominio.com', 'www.tudominio.com'
-        - Local (pruebas): 'localhost', '127.0.0.1', ''
+   ✅ El bloqueo por dominio está DESACTIVADO.
+   ✅ Funciona en cualquier hosting: GitHub Pages, Netlify,
+      Vercel, dominio propio, local, file://, etc.
    ============================================================ */
-const DOMINIOS_AUTORIZADOS = [
-  'tuusuario.github.io',   // 👈 CAMBIA ESTO por tu usuario de GitHub
-  'localhost',
-  '127.0.0.1',
-  ''                       // permite abrir el archivo local (file://)
-];
-
-/* ------------------------------------------------------------
-   Si quieres PERMITIR TODO (para pruebas), deja el array vacío:
-   const DOMINIOS_AUTORIZADOS = [];
-   ------------------------------------------------------------ */
+const DOMINIOS_AUTORIZADOS = []; // vacío = sin restricción
 
 const BLOQUEAR_CLIC_DERECHO = true;
 const BLOQUEAR_DEVTOOLS      = true;
@@ -305,7 +290,7 @@ const BLOQUEAR_ATAJOS        = true;
 const MOSTRAR_MARCA_AGUA     = true;
 
 /* ============================================================
-   VERIFICACIÓN DE DOMINIO — primera barrera
+   VERIFICACIÓN DE DOMINIO — desactivada si la lista está vacía
    ============================================================ */
 (function checkDominio(){
   if (DOMINIOS_AUTORIZADOS.length === 0) return;
@@ -322,7 +307,6 @@ const MOSTRAR_MARCA_AGUA     = true;
       '<p style="background:#ffffff10;padding:10px 16px;border-radius:10px;display:inline-block;' +
       'font-family:monospace;margin:12px 0">' + host + '</p>' +
       '<p style="opacity:.6;font-size:13px;margin-top:20px">' +
-      'Si eres el propietario, autoriza tu dominio en <code>DOMINIOS_AUTORIZADOS</code>.<br>' +
       '© OmniClase · Todos los derechos reservados</p>' +
       '</div></body>';
     throw new Error('Dominio no autorizado: ' + host);

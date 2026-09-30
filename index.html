@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1115">
-<title>Pizarra OmniClase · Idiomas</title>
+<title>Pizarra OmniClase · Profesor por Voz</title>
 <style>
   :root{
     --bg:#fff; --fg:#111; --panel:rgba(255,255,255,.94);
     --border:rgba(0,0,0,.08); --accent:#007aff; --ok:#34c759; --ko:#ff3b30;
-    --shadow:0 6px 24px rgba(0,0,0,.12);
+    --warn:#ff9500; --shadow:0 6px 24px rgba(0,0,0,.12);
     --fs-ui:    clamp(12px, 1.1vw + .3vh, 20px);
     --fs-small: clamp(10px, .9vw + .2vh, 16px);
     --fs-btn:   clamp(14px, 1.4vw + .4vh, 26px);
@@ -71,7 +71,7 @@
   input[type="range"]{width:clamp(60px,8vw,180px);accent-color:var(--accent);min-height:var(--btn-min);}
   .palette{display:flex;gap:calc(var(--gap-ui)*.5);flex-wrap:wrap;}
   .swatch{width:calc(var(--btn-min)*.55);height:calc(var(--btn-min)*.55);
-    border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .1s;}
+    border-radius:50%;border:2px solid transparent;cursor:pointer;}
   .swatch.sel{border-color:var(--fg);}
 
   #menuToggle{
@@ -86,23 +86,14 @@
     position:fixed;bottom:calc(8px + var(--safe-b));left:calc(8px + var(--safe-l));
     z-index:20;background:var(--panel);padding:calc(var(--pad-ui)*.6) calc(var(--pad-ui)*1.1);
     border-radius:calc(var(--radius)*.7);font-size:var(--fs-small);opacity:.85;pointer-events:none;
-    border:1px solid var(--border);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-    max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    border:1px solid var(--border);max-width:60vw;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  #transcript{
-    position:fixed;bottom:calc(8px + var(--safe-b));right:calc(8px + var(--safe-r));
-    z-index:20;width:min(340px,60vw);max-height:38vh;overflow:auto;
-    background:var(--panel);padding:calc(var(--pad-ui)*1.2) calc(var(--pad-ui)*1.4);
-    border-radius:var(--radius);font-size:var(--fs-small);border:1px solid var(--border);
-    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:none;
-  }
-  #transcript h4{font-size:var(--fs-small);opacity:.6;margin-bottom:6px;text-transform:uppercase;}
-  #transcript p{margin:4px 0;line-height:1.4;}
 
-  /* ================= PANEL DE IDIOMAS ================= */
+  /* ============== PANEL DE IDIOMAS ============== */
   #langPanel{
     position:fixed;top:calc(70px + var(--safe-t));right:calc(10px + var(--safe-r));
-    width:min(400px, 92vw);max-height:calc(100vh - 90px - var(--safe-b));
+    width:min(400px,92vw);max-height:calc(100vh - 90px - var(--safe-b));
     background:var(--panel);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
     border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);
     z-index:30;display:flex;flex-direction:column;overflow:hidden;
@@ -121,10 +112,7 @@
     padding:calc(var(--pad-ui)) calc(var(--pad-ui)*1.4);border-bottom:1px solid var(--border);
   }
   #langPanel .lp-langs label{display:flex;flex-direction:column;gap:4px;font-size:var(--fs-small);opacity:.75;}
-  #langPanel .lp-langs select{
-    min-width:auto;min-height:auto;padding:6px 8px;font-size:var(--fs-small);
-    background:rgba(127,127,127,.08);
-  }
+  #langPanel .lp-langs select{min-width:auto;min-height:auto;padding:6px 8px;font-size:var(--fs-small);background:rgba(127,127,127,.08);}
   #langPanel .lp-tabs{
     display:flex;gap:2px;padding:6px calc(var(--pad-ui)*1.4);
     border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
@@ -143,10 +131,7 @@
     font-size:var(--fs-small);opacity:.75;display:flex;justify-content:space-between;
   }
   #langPanel .cat-list{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;}
-  #langPanel .cat-list button{
-    min-width:auto;min-height:auto;padding:6px 10px;font-size:var(--fs-small);
-    border-radius:20px;
-  }
+  #langPanel .cat-list button{min-width:auto;min-height:auto;padding:6px 10px;font-size:var(--fs-small);border-radius:20px;}
   #langPanel .vocab-list{display:flex;flex-direction:column;gap:6px;}
   #langPanel .v-item{
     display:flex;justify-content:space-between;align-items:center;gap:8px;
@@ -157,49 +142,83 @@
   #langPanel .v-src{font-size:var(--fs-small);opacity:.65;}
   #langPanel .v-tgt{font-size:var(--fs-ui);font-weight:600;word-break:break-word;}
   #langPanel .v-actions{display:flex;gap:4px;flex-shrink:0;}
-  #langPanel .v-actions button{
-    min-width:auto;min-height:auto;padding:6px 8px;font-size:var(--fs-btn);
-  }
-  #langPanel .verb-table{
-    width:100%;border-collapse:collapse;font-size:var(--fs-small);margin-top:8px;
-  }
-  #langPanel .verb-table th,#langPanel .verb-table td{
-    padding:5px 6px;border-bottom:1px solid var(--border);text-align:left;
-  }
+  #langPanel .v-actions button{min-width:auto;min-height:auto;padding:6px 8px;font-size:var(--fs-btn);}
+  #langPanel .verb-table{width:100%;border-collapse:collapse;font-size:var(--fs-small);margin-top:8px;}
+  #langPanel .verb-table th,#langPanel .verb-table td{padding:5px 6px;border-bottom:1px solid var(--border);text-align:left;}
   #langPanel .verb-table th{opacity:.65;font-weight:500;}
-  #langPanel h4.section{font-size:var(--fs-small);text-transform:uppercase;opacity:.6;
-    margin:10px 0 6px;letter-spacing:.05em;}
+  #langPanel h4.section{font-size:var(--fs-small);text-transform:uppercase;opacity:.6;margin:10px 0 6px;letter-spacing:.05em;}
 
-  /* ================= BARRA DE PRÁCTICA ================= */
-  #practiceBar{
+  /* ============== PANEL DEL PROFESOR ============== */
+  #teacherBar{
     position:fixed;bottom:calc(10px + var(--safe-b));left:50%;
     transform:translateX(-50%) translateY(200%);
-    z-index:40;width:min(700px,94vw);
+    z-index:45;width:min(760px,96vw);
     background:var(--panel);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
     border:1px solid var(--border);border-radius:var(--radius);
-    box-shadow:var(--shadow);padding:calc(var(--pad-ui)*1.2) calc(var(--pad-ui)*1.4);
-    display:flex;flex-direction:column;gap:8px;
-    transition:transform .3s cubic-bezier(.2,.8,.2,1);
+    box-shadow:var(--shadow);padding:calc(var(--pad-ui)*1.3) calc(var(--pad-ui)*1.5);
+    display:flex;flex-direction:column;gap:10px;
+    transition:transform .35s cubic-bezier(.2,.8,.2,1);
   }
-  #practiceBar.open{transform:translateX(-50%) translateY(0);}
-  #practiceBar .pb-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  #practiceBar .pb-tag{
-    font-size:var(--fs-small);background:var(--accent);color:#fff;
-    padding:4px 10px;border-radius:20px;text-transform:uppercase;font-weight:600;letter-spacing:.05em;
+  #teacherBar.open{transform:translateX(-50%) translateY(0);}
+
+  #teacherBar .tb-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  #teacherBar .tb-avatar{
+    width:clamp(36px,3.5vw+1vh,56px);height:clamp(36px,3.5vw+1vh,56px);
+    border-radius:50%;background:linear-gradient(135deg,var(--accent),#5856d6);
+    display:flex;align-items:center;justify-content:center;
+    font-size:clamp(18px,2vw+.5vh,28px);flex-shrink:0;
+    transition:transform .2s;
   }
-  #practiceBar .pb-word{
-    font-size:clamp(20px,2.4vw + .8vh,42px);font-weight:700;flex:1;min-width:0;
-    word-break:break-word;
+  #teacherBar .tb-avatar.talking{animation:pulse 1.2s infinite;}
+  @keyframes pulse{
+    0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,122,255,.5);}
+    50%{transform:scale(1.06);box-shadow:0 0 0 12px rgba(0,122,255,0);}
   }
-  #practiceBar .pb-word.hidden-answer{filter:blur(8px);opacity:.6;}
-  #practiceBar .pb-actions{display:flex;gap:6px;flex-wrap:wrap;}
-  #practiceBar button{
-    min-width:auto;min-height:auto;padding:8px 14px;font-size:var(--fs-small);
-    border-radius:10px;
+  #teacherBar .tb-info{display:flex;flex-direction:column;min-width:0;flex:1;}
+  #teacherBar .tb-name{font-size:var(--fs-small);opacity:.65;text-transform:uppercase;letter-spacing:.05em;}
+  #teacherBar .tb-status{font-size:var(--fs-ui);font-weight:600;}
+  #teacherBar .tb-live{
+    font-size:var(--fs-small);opacity:.85;padding:4px 10px;border-radius:20px;
+    background:rgba(127,127,127,.12);display:flex;align-items:center;gap:6px;
   }
-  #practiceBar .ok{background:var(--ok);color:#fff;border-color:var(--ok);}
-  #practiceBar .ko{background:var(--ko);color:#fff;border-color:var(--ko);}
-  #practiceBar .pb-hint{font-size:var(--fs-small);opacity:.7;line-height:1.4;}
+  #teacherBar .tb-live.rec{background:rgba(255,59,48,.18);color:var(--ko);}
+  #teacherBar .tb-live .dot{
+    width:8px;height:8px;border-radius:50%;background:var(--ko);
+    animation:blink .8s infinite;
+  }
+  @keyframes blink{50%{opacity:.2;}}
+
+  #teacherBar .tb-question{
+    background:rgba(0,122,255,.08);border:1px solid rgba(0,122,255,.25);
+    border-radius:calc(var(--radius)*.8);padding:10px 14px;
+    font-size:clamp(15px,1.5vw+.5vh,24px);line-height:1.4;font-weight:500;
+  }
+  #teacherBar .tb-question .q-lang{
+    font-size:var(--fs-small);opacity:.6;display:block;margin-bottom:4px;text-transform:uppercase;
+  }
+  #teacherBar .tb-transcript{
+    background:rgba(127,127,127,.08);border-radius:calc(var(--radius)*.8);
+    padding:8px 12px;font-size:var(--fs-small);min-height:1.6em;
+    font-style:italic;opacity:.85;
+  }
+  #teacherBar .tb-feedback{
+    font-size:var(--fs-ui);font-weight:600;padding:6px 2px;display:none;
+  }
+  #teacherBar .tb-feedback.ok{color:var(--ok);display:block;}
+  #teacherBar .tb-feedback.ko{color:var(--ko);display:block;}
+  #teacherBar .tb-feedback.partial{color:var(--warn);display:block;}
+
+  #teacherBar .tb-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  #teacherBar .tb-actions button{
+    min-width:auto;min-height:auto;padding:8px 14px;font-size:var(--fs-small);border-radius:10px;
+  }
+  #teacherBar .tb-actions .primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  #teacherBar .tb-actions .rec{background:var(--ko);color:#fff;border-color:var(--ko);}
+  #teacherBar .tb-actions .ok{background:var(--ok);color:#fff;border-color:var(--ok);}
+
+  #teacherBar .tb-progress{
+    font-size:var(--fs-small);opacity:.65;display:flex;gap:14px;flex-wrap:wrap;
+  }
 
   @media (max-width:640px){
     #toolbar{gap:3px;padding:4px;}
@@ -207,11 +226,13 @@
     .hide-xs{display:none !important;}
     #menuToggle{display:flex;}
     #toolbar{max-height:70vh;}
-    #langPanel{top:auto;bottom:0;right:0;left:0;width:100vw;max-height:75vh;border-radius:16px 16px 0 0;
-      transform:translateY(110%);}
+    #langPanel{top:auto;bottom:0;right:0;left:0;width:100vw;max-height:75vh;
+      border-radius:16px 16px 0 0;transform:translateY(110%);}
     #langPanel.open{transform:translateY(0);}
+    #teacherBar{bottom:0;left:0;right:0;width:100vw;border-radius:16px 16px 0 0;
+      transform:translateY(110%);}
+    #teacherBar.open{transform:translateY(0);}
   }
-  @media (min-width:641px) and (max-width:1024px){ .hide-md{display:none !important;} }
   @media (min-width:2200px){ #toolbar{max-width:90vw;margin:0 auto;left:5vw;right:5vw;} }
   @supports (padding:env(safe-area-inset-top)){ #toolbar{margin-top:var(--safe-t);} }
   @media (prefers-color-scheme:dark){
@@ -268,7 +289,7 @@
   </div>
   <div class="group">
     <button id="openLang" title="Aprender idiomas">🌍</button>
-    <button id="mic" title="Dictado">🎙️</button>
+    <button id="openTeacher" title="Profesor por voz">🎓</button>
     <button id="save" title="Guardar PNG">💾</button>
     <button id="saveJson" title="Proyecto" class="hide-md">📁</button>
     <button id="loadJson" title="Abrir" class="hide-md">📂</button>
@@ -278,52 +299,65 @@
 </div>
 
 <div id="status">Listo · Pizarra OmniClase</div>
-<div id="transcript"><h4>Transcripción</h4><div id="transcriptBody"></div></div>
 <input type="file" id="fileInput" accept=".json" style="display:none">
 
-<!-- ================= PANEL DE IDIOMAS ================= -->
+<!-- ============ PANEL DE IDIOMAS ============ -->
 <div id="langPanel">
   <div class="lp-head">
     <h3>🌍 Aprender idiomas</h3>
     <button id="lpClose">✕</button>
   </div>
   <div class="lp-langs">
-    <label>Idioma base
-      <select id="langSource"></select>
-    </label>
-    <label>Aprender
-      <select id="langTarget"></select>
-    </label>
+    <label>Idioma base<select id="langSource"></select></label>
+    <label>Aprender<select id="langTarget"></select></label>
   </div>
   <div class="lp-tabs" id="lpTabs">
     <button data-tab="vocab" class="active">Vocabulario</button>
     <button data-tab="phrases">Frases</button>
     <button data-tab="quiz">Quiz</button>
-    <button data-tab="dictado">Dictado</button>
     <button data-tab="verbos">Verbos</button>
   </div>
   <div class="lp-body" id="lpBody"></div>
   <div class="lp-progress">
-    <span>✅ <b id="lpOK">0</b> aciertos</span>
-    <span>❌ <b id="lpKO">0</b> fallos</span>
-    <span>📖 <b id="lpSeen">0</b> vistos</span>
+    <span>✅ <b id="lpOK">0</b></span>
+    <span>❌ <b id="lpKO">0</b></span>
+    <span>📖 <b id="lpSeen">0</b></span>
   </div>
 </div>
 
-<!-- ================= BARRA DE PRÁCTICA ================= -->
-<div id="practiceBar">
-  <div class="pb-top">
-    <span class="pb-tag" id="pbTag">Escribe</span>
-    <span class="pb-word" id="pbWord">—</span>
-    <button id="pbSpeak" title="Escuchar">🔊</button>
+<!-- ============ BARRA DEL PROFESOR ============ -->
+<div id="teacherBar">
+  <div class="tb-head">
+    <div class="tb-avatar" id="tbAvatar">👩‍🏫</div>
+    <div class="tb-info">
+      <span class="tb-name">Profesora OmniClase</span>
+      <span class="tb-status" id="tbStatus">Lista para empezar</span>
+    </div>
+    <div class="tb-live" id="tbLive">🎤 Esperando…</div>
   </div>
-  <div class="pb-hint" id="pbHint"></div>
-  <div class="pb-actions">
-    <button id="pbReveal">👁 Ver respuesta</button>
-    <button id="pbOK" class="ok">✓ Correcto</button>
-    <button id="pbKO" class="ko">✗ Repetir</button>
-    <button id="pbNext">Siguiente →</button>
-    <button id="pbClose">Salir</button>
+
+  <div class="tb-question">
+    <span class="q-lang" id="tbQLang">Pregunta</span>
+    <span id="tbQuestion">Presiona "Comenzar clase" para empezar.</span>
+  </div>
+
+  <div class="tb-transcript" id="tbTranscript">Aquí verás lo que el profe escucha…</div>
+
+  <div class="tb-feedback" id="tbFeedback"></div>
+
+  <div class="tb-progress">
+    <span>🏆 Aciertos: <b id="tbOK">0</b></span>
+    <span>💪 A mejorar: <b id="tbKO">0</b></span>
+    <span>📊 Ronda: <b id="tbRound">0</b>/10</span>
+  </div>
+
+  <div class="tb-actions">
+    <button id="tbStart" class="primary">▶ Comenzar clase</button>
+    <button id="tbRepeat">🔁 Repetir pregunta</button>
+    <button id="tbMic" class="rec" disabled>🎤 Hablar</button>
+    <button id="tbReveal" disabled>👁 Ver respuesta</button>
+    <button id="tbSkip" disabled>⏭ Siguiente</button>
+    <button id="tbStop" disabled>✕ Detener</button>
   </div>
 </div>
 
@@ -332,7 +366,7 @@
 'use strict';
 
 /* ============================================================
-   PIZARRA (base)
+   PIZARRA
    ============================================================ */
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
@@ -358,8 +392,7 @@ function resize(){
     W = window.innerWidth; H = window.innerHeight;
     canvas.width = Math.floor(W*dpr);
     canvas.height = Math.floor(H*dpr);
-    canvas.style.width = W+'px';
-    canvas.style.height = H+'px';
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
     redraw();
   }, 80);
@@ -593,8 +626,7 @@ document.getElementById('addPage').addEventListener('click',()=>{
 document.getElementById('save').addEventListener('click',()=>{
   const link = document.createElement('a');
   link.download = 'omniclase-p'+(state.pageIndex+1)+'.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+  link.href = canvas.toDataURL('image/png'); link.click();
 });
 document.getElementById('saveJson').addEventListener('click',()=>{
   const data = JSON.stringify({version:2,pages:state.pages,pageIndex:state.pageIndex,bg:state.bg});
@@ -619,28 +651,6 @@ fileInput.addEventListener('change',e=>{
     }catch(_){alert('Archivo inválido');}
   };
   r.readAsText(f); fileInput.value='';
-});
-
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null, listening = false;
-document.getElementById('mic').addEventListener('click',()=>{
-  if (!SR) return alert('Reconocimiento de voz no soportado. Usa Chrome o Edge.');
-  if (listening){recognition.stop();return;}
-  recognition = new SR();
-  recognition.lang='es-ES'; recognition.continuous=true; recognition.interimResults=true;
-  recognition.onstart=()=>{listening=true;document.getElementById('mic').classList.add('active');document.getElementById('transcript').style.display='block';status('Escuchando…');};
-  recognition.onresult=e=>{
-    let txt='';
-    for (let i=e.resultIndex;i<e.results.length;i++) if (e.results[i].isFinal) txt+=e.results[i][0].transcript;
-    if (txt){
-      const p=document.createElement('p'); p.textContent='• '+txt.trim();
-      document.getElementById('transcriptBody').appendChild(p);
-      document.getElementById('transcriptBody').scrollTop = 1e9;
-    }
-  };
-  recognition.onerror=()=>status('Error de micrófono');
-  recognition.onend=()=>{listening=false;document.getElementById('mic').classList.remove('active');status('Dictado detenido');};
-  recognition.start();
 });
 
 document.getElementById('full').addEventListener('click',()=>{
@@ -681,13 +691,13 @@ function status(m){
   statusTimer = setTimeout(()=>statusEl.textContent='Listo · Pizarra OmniClase',2500);
 }
 function autosave(){
-  try{localStorage.setItem('omniclase_v3',JSON.stringify({
+  try{localStorage.setItem('omniclase_v4',JSON.stringify({
     pages:state.pages,pageIndex:state.pageIndex,bg:state.bg,dark:state.dark
   }));}catch(_){}
 }
 function loadAutosave(){
   try{
-    const raw = localStorage.getItem('omniclase_v3'); if (!raw) return;
+    const raw = localStorage.getItem('omniclase_v4'); if (!raw) return;
     const d = JSON.parse(raw);
     if (d.pages && d.pages.length){
       state.pages=d.pages; state.pageIndex=d.pageIndex||0;
@@ -700,7 +710,7 @@ function loadAutosave(){
 loadAutosave(); updatePageLabel(); setTool('pen'); resize();
 
 /* ============================================================
-   🌍 MÓDULO DE IDIOMAS
+   VOCABULARIO / FRASES / VERBOS
    ============================================================ */
 const LANGS = {
   es: { name:'Español',   voice:'es-ES', flag:'🇪🇸' },
@@ -814,7 +824,7 @@ const VOCAB = {
     {es:'Sala',en:'Living room',fr:'Salon',pt:'Sala'},
     {es:'Jardín',en:'Garden',fr:'Jardin',pt:'Jardim'}
   ]},
-  dias: { label:'Días y meses', items:[
+  dias: { label:'Días', items:[
     {es:'Lunes',en:'Monday',fr:'Lundi',pt:'Segunda-feira'},
     {es:'Martes',en:'Tuesday',fr:'Mardi',pt:'Terça-feira'},
     {es:'Miércoles',en:'Wednesday',fr:'Mercredi',pt:'Quarta-feira'},
@@ -824,9 +834,7 @@ const VOCAB = {
     {es:'Domingo',en:'Sunday',fr:'Dimanche',pt:'Domingo'},
     {es:'Enero',en:'January',fr:'Janvier',pt:'Janeiro'},
     {es:'Febrero',en:'February',fr:'Février',pt:'Fevereiro'},
-    {es:'Marzo',en:'March',fr:'Mars',pt:'Março'},
-    {es:'Abril',en:'April',fr:'Avril',pt:'Abril'},
-    {es:'Mayo',en:'May',fr:'Mai',pt:'Maio'}
+    {es:'Marzo',en:'March',fr:'Mars',pt:'Março'}
   ]},
   verbos: { label:'Verbos', items:[
     {es:'Ser',en:'To be',fr:'Être',pt:'Ser'},
@@ -876,49 +884,41 @@ const PHRASES = [
 ];
 
 const VERB_TABLES = {
-  ser: {
-    label:'Ser / To be / Être / Ser',
+  ser: { label:'Ser',
     es:['soy','eres','es','somos','sois','son'],
     en:['I am','you are','he/she is','we are','you are','they are'],
     fr:['je suis','tu es','il/elle est','nous sommes','vous êtes','ils/elles sont'],
     pt:['eu sou','você é','ele/ela é','nós somos','vocês são','eles/elas são']
   },
-  tener: {
-    label:'Tener / To have / Avoir / Ter',
+  tener: { label:'Tener',
     es:['tengo','tienes','tiene','tenemos','tenéis','tienen'],
     en:['I have','you have','he/she has','we have','you have','they have'],
     fr:["j'ai",'tu as','il/elle a','nous avons','vous avez','ils/elles ont'],
     pt:['eu tenho','você tem','ele/ela tem','nós temos','vocês têm','eles/elas têm']
   },
-  ir: {
-    label:'Ir / To go / Aller / Ir',
+  ir: { label:'Ir',
     es:['voy','vas','va','vamos','vais','van'],
     en:['I go','you go','he/she goes','we go','you go','they go'],
     fr:['je vais','tu vas','il/elle va','nous allons','vous allez','ils/elles vont'],
     pt:['eu vou','você vai','ele/ela vai','nós vamos','vocês vão','eles/elas vão']
   },
-  hacer: {
-    label:'Hacer / To do / Faire / Fazer',
+  hacer: { label:'Hacer',
     es:['hago','haces','hace','hacemos','hacéis','hacen'],
     en:['I do','you do','he/she does','we do','you do','they do'],
     fr:['je fais','tu fais','il/elle fait','nous faisons','vous faites','ils/elles font'],
     pt:['eu faço','você faz','ele/ela faz','nós fazemos','vocês fazem','eles/elas fazem']
   }
 };
-
 const PRONOUNS = ['1ª sing.','2ª sing.','3ª sing.','1ª pl.','2ª pl.','3ª pl.'];
 
-/* --------- Estado del módulo --------- */
 const langState = {
   source: 'es',
   target: 'en',
   activeTab: 'vocab',
   activeCategory: 'saludos',
   activeVerb: 'ser',
-  practice: null,
   progress: loadProgress()
 };
-
 function loadProgress(){
   try{
     const raw = localStorage.getItem('omniclase_lang');
@@ -935,23 +935,23 @@ function refreshProgressUI(){
   document.getElementById('lpSeen').textContent = langState.progress.seen.length;
 }
 
-/* --------- Voz --------- */
-function speak(text, lang){
-  if (!('speechSynthesis' in window)) return;
+/* ---------- Voz: hablar ---------- */
+function speak(text, lang, cb){
+  if (!('speechSynthesis' in window)){ if (cb) cb(); return; }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = LANGS[lang].voice;
-  u.rate = .9;
+  u.lang = LANGS[lang]?.voice || 'es-ES';
+  u.rate = .92;
+  u.pitch = 1.05;
   const voices = speechSynthesis.getVoices();
   const v = voices.find(vv => vv.lang.toLowerCase().startsWith(lang));
   if (v) u.voice = v;
+  u.onend = () => { if (cb) cb(); };
+  u.onerror = () => { if (cb) cb(); };
   speechSynthesis.speak(u);
 }
-if ('speechSynthesis' in window){
-  speechSynthesis.onvoiceschanged = () => {};
-}
 
-/* --------- Panel DOM --------- */
+/* ---------- Panel idiomas ---------- */
 const langPanel = document.getElementById('langPanel');
 const lpBody = document.getElementById('lpBody');
 const lpTabs = document.getElementById('lpTabs');
@@ -983,18 +983,15 @@ lpTabs.addEventListener('click', e=>{
   renderTab();
 });
 
-/* --------- Render de cada pestaña --------- */
 function renderTab(){
   lpBody.innerHTML = '';
   const tab = langState.activeTab;
   if (tab==='vocab') renderVocab();
   else if (tab==='phrases') renderPhrases();
   else if (tab==='quiz') renderQuiz();
-  else if (tab==='dictado') renderDictado();
   else if (tab==='verbos') renderVerbos();
   refreshProgressUI();
 }
-
 function renderVocab(){
   const cats = Object.entries(VOCAB);
   const catsHtml = cats.map(([k,v])=>
@@ -1002,16 +999,14 @@ function renderVocab(){
   ).join('');
   lpBody.innerHTML = `<div class="cat-list">${catsHtml}</div><div class="vocab-list" id="vl"></div>`;
   lpBody.querySelector('.cat-list').addEventListener('click', e=>{
-    const btn = e.target.closest('button');
-    if (!btn) return;
+    const btn = e.target.closest('button'); if (!btn) return;
     langState.activeCategory = btn.dataset.cat;
     renderVocab();
   });
   const list = lpBody.querySelector('#vl');
-  const items = VOCAB[langState.activeCategory].items;
-  items.forEach(it=>{
+  VOCAB[langState.activeCategory].items.forEach(it=>{
     const src = it[langState.source], tgt = it[langState.target];
-    if (!src || !tgt) return;
+    if (!src||!tgt) return;
     const el = document.createElement('div');
     el.className = 'v-item';
     el.innerHTML = `
@@ -1020,65 +1015,27 @@ function renderVocab(){
         <span class="v-tgt">${tgt}</span>
       </div>
       <div class="v-actions">
-        <button title="Escuchar" data-act="speak">🔊</button>
-        <button title="Practicar" data-act="practice">✍️</button>
+        <button data-act="speak">🔊</button>
       </div>`;
     el.querySelector('[data-act="speak"]').addEventListener('click', ()=>speak(tgt, langState.target));
-    el.querySelector('[data-act="practice"]').addEventListener('click', ()=>{
-      startPractice({
-        mode:'vocab',
-        prompt: src,
-        answer: tgt,
-        answerLang: langState.target,
-        hintText:`Escribe en ${LANGS[langState.target].name}:`
-      });
-    });
     list.appendChild(el);
   });
 }
-
 function renderPhrases(){
   const html = PHRASES.map((p,i)=>{
     const src = p[langState.source], tgt = p[langState.target];
     if (!src||!tgt) return '';
     return `<div class="v-item" data-i="${i}">
-      <div class="v-text">
-        <span class="v-src">${src}</span>
-        <span class="v-tgt">${tgt}</span>
-      </div>
-      <div class="v-actions">
-        <button data-act="speak">🔊</button>
-        <button data-act="practice">✍️</button>
-      </div>
+      <div class="v-text"><span class="v-src">${src}</span><span class="v-tgt">${tgt}</span></div>
+      <div class="v-actions"><button data-act="speak">🔊</button></div>
     </div>`;
   }).join('');
   lpBody.innerHTML = `<h4 class="section">Frases útiles</h4><div class="vocab-list">${html}</div>`;
   lpBody.querySelectorAll('.v-item').forEach(el=>{
     const p = PHRASES[+el.dataset.i];
-    const src = p[langState.source], tgt = p[langState.target];
-    el.querySelector('[data-act="speak"]').addEventListener('click', ()=>speak(tgt, langState.target));
-    el.querySelector('[data-act="practice"]').addEventListener('click', ()=>{
-      startPractice({
-        mode:'frase',
-        prompt: src,
-        answer: tgt,
-        answerLang: langState.target,
-        hintText:`Escribe la frase completa en ${LANGS[langState.target].name}:`
-      });
-    });
+    el.querySelector('[data-act="speak"]').addEventListener('click', ()=>speak(p[langState.target], langState.target));
   });
 }
-
-function allWords(){
-  const arr = [];
-  Object.values(VOCAB).forEach(cat=>cat.items.forEach(it=>arr.push(it)));
-  return arr;
-}
-function randomWord(){
-  const arr = allWords();
-  return arr[Math.floor(Math.random()*arr.length)];
-}
-
 function renderQuiz(){
   lpBody.innerHTML = `
     <h4 class="section">Quiz aleatorio</h4>
@@ -1092,48 +1049,21 @@ function renderQuiz(){
     nextQuizQuestion();
   });
 }
+function allWords(){ const a=[]; Object.values(VOCAB).forEach(c=>c.items.forEach(i=>a.push(i))); return a; }
+function randomWord(){ const a=allWords(); return a[Math.floor(Math.random()*a.length)]; }
+
 function nextQuizQuestion(){
   const w = randomWord();
   const prompt = w[langState.source], answer = w[langState.target];
   if (!prompt||!answer) return nextQuizQuestion();
   startPractice({
     mode:'quiz',
-    prompt,
-    answer,
+    prompt, answer,
     answerLang: langState.target,
-    hintText:`Traduce al ${LANGS[langState.target].name} y escríbelo en la pizarra:`,
+    hintText:`Traduce al ${LANGS[langState.target].name}:`,
     onNext: nextQuizQuestion
   });
 }
-
-function renderDictado(){
-  lpBody.innerHTML = `
-    <h4 class="section">Dictado</h4>
-    <p style="font-size:var(--fs-small);opacity:.7;margin-bottom:12px;line-height:1.5">
-      Escucharás una palabra en <b>${LANGS[langState.target].name}</b>. Escríbela en la pizarra.
-      Al final, presiona <b>Ver respuesta</b>.
-    </p>
-    <button id="startDict" style="background:var(--accent);color:#fff;border-color:var(--accent);width:100%;min-height:44px;">Comenzar dictado</button>`;
-  lpBody.querySelector('#startDict').addEventListener('click', ()=>{
-    langPanel.classList.remove('open');
-    nextDictado();
-  });
-}
-function nextDictado(){
-  const w = randomWord();
-  const answer = w[langState.target];
-  if (!answer) return nextDictado();
-  startPractice({
-    mode:'dictado',
-    prompt: '🔊',
-    answer,
-    answerLang: langState.target,
-    hintText:`Escucha y escribe lo que oyes en ${LANGS[langState.target].name}:`,
-    autoSpeak: answer,
-    onNext: nextDictado
-  });
-}
-
 function renderVerbos(){
   const v = VERB_TABLES[langState.activeVerb];
   const keys = ['es','en','fr','pt'];
@@ -1143,7 +1073,7 @@ function renderVerbos(){
     return `<tr><th>${p}</th>${cells}</tr>`;
   }).join('');
   const selectors = Object.entries(VERB_TABLES).map(([k,val])=>
-    `<button data-verb="${k}" class="${k===langState.activeVerb?'active':''}">${val.label.split('/')[0].trim()}</button>`
+    `<button data-verb="${k}" class="${k===langState.activeVerb?'active':''}">${val.label}</button>`
   ).join('');
   lpBody.innerHTML = `
     <h4 class="section">Conjugación presente</h4>
@@ -1158,89 +1088,404 @@ function renderVerbos(){
   });
 }
 
-/* ============================================================
-   MODO PRÁCTICA
-   ============================================================ */
+/* ---------- Modo práctica (quiz) ---------- */
 const practiceBar = document.getElementById('practiceBar');
-const pbTag = document.getElementById('pbTag');
-const pbWord = document.getElementById('pbWord');
-const pbHint = document.getElementById('pbHint');
+let practiceState = null;
 
 function startPractice(cfg){
-  langState.practice = { ...cfg, revealed:false };
-  practiceBar.classList.add('open');
-  pbTag.textContent = cfg.mode.toUpperCase();
-  pbHint.textContent = cfg.hintText || '';
-  pbWord.classList.remove('hidden-answer');
-  pbWord.textContent = cfg.prompt;
-  if (cfg.autoSpeak) setTimeout(()=>speak(cfg.autoSpeak, cfg.answerLang), 300);
-  // Pista extra: revelar solo la palabra clave en dictado
-  if (cfg.mode === 'dictado'){
-    pbWord.textContent = '🎧 Palabra oculta';
-    pbWord.classList.add('hidden-answer');
+  practiceState = { ...cfg, revealed:false };
+  // Reutilizamos teacherBar para quiz simple
+  document.getElementById('openTeacher').click();
+}
+
+/* ============================================================
+   🎓 PROFESOR POR VOZ
+   ============================================================ */
+const teacherBar = document.getElementById('teacherBar');
+const tbAvatar = document.getElementById('tbAvatar');
+const tbStatus = document.getElementById('tbStatus');
+const tbLive = document.getElementById('tbLive');
+const tbQLang = document.getElementById('tbQLang');
+const tbQuestion = document.getElementById('tbQuestion');
+const tbTranscript = document.getElementById('tbTranscript');
+const tbFeedback = document.getElementById('tbFeedback');
+const tbOK = document.getElementById('tbOK');
+const tbKO = document.getElementById('tbKO');
+const tbRound = document.getElementById('tbRound');
+
+const btnStart = document.getElementById('tbStart');
+const btnRepeat = document.getElementById('tbRepeat');
+const btnMic = document.getElementById('tbMic');
+const btnReveal = document.getElementById('tbReveal');
+const btnSkip = document.getElementById('tbSkip');
+const btnStop = document.getElementById('tbStop');
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const teacher = {
+  active: false,
+  current: null,
+  round: 0,
+  maxRound: 10,
+  ok: 0,
+  ko: 0,
+  recognition: null,
+  listening: false,
+  speaking: false,
+  waitingForSpeech: false,
+  silenceTimer: null
+};
+
+/* ---------- Normalización de texto para comparar ---------- */
+function normalize(str){
+  return String(str)
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // quitar acentos
+    .replace(/[¿?¡!.,;:"'`´]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+/* Similitud tipo Levenshtein */
+function levenshtein(a,b){
+  if (a===b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const m = [];
+  for (let i=0;i<=b.length;i++) m[i]=[i];
+  for (let j=0;j<=a.length;j++) m[0][j]=j;
+  for (let i=1;i<=b.length;i++){
+    for (let j=1;j<=a.length;j++){
+      m[i][j] = b[i-1]===a[j-1]
+        ? m[i-1][j-1]
+        : Math.min(m[i-1][j-1]+1, m[i][j-1]+1, m[i-1][j]+1);
+    }
   }
-  status('Modo práctica: escribe en la pizarra');
+  return m[b.length][a.length];
 }
-function endPractice(){
-  langState.practice = null;
-  practiceBar.classList.remove('open');
+function similarity(a,b){
+  a = normalize(a); b = normalize(b);
+  if (!a && !b) return 1;
+  const d = levenshtein(a,b);
+  const max = Math.max(a.length,b.length);
+  return max === 0 ? 1 : 1 - d/max;
 }
 
-document.getElementById('pbClose').addEventListener('click', endPractice);
-document.getElementById('pbSpeak').addEventListener('click', ()=>{
-  if (!langState.practice) return;
-  const p = langState.practice;
-  speak(p.answer, p.answerLang || langState.target);
+/* ---------- Construir pregunta ---------- */
+function buildQuestion(){
+  const src = langState.source, tgt = langState.target;
+  const w = randomWord();
+  const fromWord = w[src], toWord = w[tgt];
+  if (!fromWord || !toWord) return buildQuestion();
+
+  // Alternar entre tipos de pregunta
+  const types = ['traduce','pronuncia','repite'];
+  const type = types[Math.floor(Math.random()*types.length)];
+
+  if (type === 'traduce'){
+    return {
+      type,
+      promptText: `¿Cómo se dice "${fromWord}" en ${LANGS[tgt].name}?`,
+      expectAnswer: toWord,
+      answerLang: tgt,
+      hint: 'Puedes escribir la respuesta en la pizarra y decirla en voz alta.'
+    };
+  }
+  if (type === 'pronuncia'){
+    return {
+      type,
+      promptText: `Pronuncia esta palabra en ${LANGS[tgt].name}: "${toWord}"`,
+      expectAnswer: toWord,
+      answerLang: tgt,
+      hint: 'Repítela en voz alta, cuida la pronunciación.'
+    };
+  }
+  // repite
+  return {
+    type:'repite',
+    promptText: `Repite después de mí: "${toWord}"`,
+    expectAnswer: toWord,
+    answerLang: tgt,
+    hint: 'Escucha con atención y repite.'
+  };
+}
+
+/* ---------- Iniciar clase ---------- */
+btnStart.addEventListener('click', ()=>{
+  if (!SR){
+    alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge en PC/Android.');
+    return;
+  }
+  teacher.active = true;
+  teacher.round = 0;
+  teacher.ok = 0;
+  teacher.ko = 0;
+  refreshTeacherUI();
+  btnStart.disabled = true;
+  btnMic.disabled = false;
+  btnReveal.disabled = false;
+  btnSkip.disabled = false;
+  btnStop.disabled = false;
+  teacherBar.classList.add('open');
+  speak(`Hola, soy tu profesora de ${LANGS[langState.target].name}. Vamos a empezar.`, 'es', ()=> nextQuestion());
 });
-document.getElementById('pbReveal').addEventListener('click', ()=>{
-  if (!langState.practice) return;
-  langState.practice.revealed = true;
-  pbWord.classList.remove('hidden-answer');
-  pbWord.textContent = langState.practice.answer;
-  if (langState.practice.mode === 'quiz' || langState.practice.mode === 'dictado'){
-    speak(langState.practice.answer, langState.practice.answerLang);
+btnStop.addEventListener('click', ()=>{
+  teacher.active = false;
+  stopListening();
+  speechSynthesis.cancel();
+  teacherBar.classList.remove('open');
+  btnStart.disabled = false;
+  btnMic.disabled = true;
+  btnReveal.disabled = true;
+  btnSkip.disabled = true;
+  btnStop.disabled = true;
+  setStatus('Clase terminada');
+});
+btnRepeat.addEventListener('click', ()=>{
+  if (!teacher.current) return;
+  speak(teacher.current.promptText, 'es', ()=>{
+    if (teacher.current.type !== 'traduce'){
+      speak(teacher.current.expectAnswer, teacher.current.answerLang);
+    }
+  });
+});
+btnReveal.addEventListener('click', ()=>{
+  if (!teacher.current) return;
+  tbFeedback.className = 'tb-feedback';
+  tbTranscript.textContent = `Respuesta correcta: ${teacher.current.expectAnswer}`;
+  speak(teacher.current.expectAnswer, teacher.current.answerLang);
+});
+btnSkip.addEventListener('click', ()=>{
+  if (teacher.current) { teacher.ko++; refreshTeacherUI(); }
+  nextQuestion();
+});
+
+/* ---------- Siguiente pregunta ---------- */
+function nextQuestion(){
+  if (!teacher.active) return;
+  if (teacher.round >= teacher.maxRound){
+    endClass();
+    return;
+  }
+  teacher.round++;
+  refreshTeacherUI();
+  teacher.current = buildQuestion();
+  tbFeedback.className = 'tb-feedback';
+  tbFeedback.textContent = '';
+  tbTranscript.textContent = '…';
+  tbQLang.textContent = LANGS[langState.target].name;
+  tbQuestion.textContent = teacher.current.promptText;
+  setStatus('Pregunta ' + teacher.round);
+  tbAvatar.classList.add('talking');
+  // El profe habla
+  speak(teacher.current.promptText, 'es', ()=>{
+    tbAvatar.classList.remove('talking');
+    if (teacher.current.type === 'repite' || teacher.current.type === 'pronuncia'){
+      speak(teacher.current.expectAnswer, teacher.current.answerLang, ()=>{
+        startListening();
+      });
+    } else {
+      startListening();
+    }
+  });
+}
+
+/* ---------- Terminar clase ---------- */
+function endClass(){
+  teacher.active = false;
+  stopListening();
+  const total = teacher.ok + teacher.ko;
+  const msg = `Muy bien. Terminaste la clase. Tuviste ${teacher.ok} aciertos de ${total}.`;
+  setStatus('Clase finalizada');
+  tbQuestion.textContent = '¡Clase terminada! 🎉';
+  tbFeedback.className = 'tb-feedback ok';
+  tbFeedback.textContent = `Puntaje final: ${teacher.ok} / ${total}`;
+  speak(msg, 'es');
+  btnStart.disabled = false;
+  btnMic.disabled = true;
+  btnReveal.disabled = true;
+  btnSkip.disabled = true;
+  btnStop.disabled = true;
+}
+
+function refreshTeacherUI(){
+  tbOK.textContent = teacher.ok;
+  tbKO.textContent = teacher.ko;
+  tbRound.textContent = teacher.round;
+}
+
+/* ============================================================
+   🎤 ESCUCHA — CORREGIDA (sin alucinaciones)
+   ------------------------------------------------------------
+   Problema anterior: continuous=true + interimResults=true
+   hacía que el reconocedor acumulara ruido y "inventara" texto.
+   
+   Solución:
+   - continuous = false → una sola frase por vez
+   - interimResults = false → solo resultados finales
+   - Se reinicia limpio en cada pregunta
+   - Timeout de silencio de 6s
+   - Filtro de basura (solo se acepta si tiene ≥1 letra)
+   ============================================================ */
+function startListening(){
+  if (!teacher.active || !SR) return;
+  if (teacher.listening) return;
+  stopListening();  // asegurarse de matar instancias previas
+
+  const rec = new SR();
+  rec.lang = LANGS[langState.target].voice;
+  rec.continuous = false;      // UNA frase por vez
+  rec.interimResults = false;  // sin resultados intermedios
+  rec.maxAlternatives = 1;
+
+  let gotResult = false;
+
+  rec.onstart = () => {
+    teacher.listening = true;
+    teacher.waitingForSpeech = true;
+    tbLive.className = 'tb-live rec';
+    tbLive.innerHTML = '<span class="dot"></span> Escuchando…';
+    setStatus('🎤 Habla ahora');
+  };
+
+  rec.onresult = (e) => {
+    gotResult = true;
+    const txt = e.results[0][0].transcript.trim();
+    const conf = e.results[0][0].confidence || 0.9;
+    if (!txt || !/[a-zA-ZÀ-ÿ]/.test(txt)) return; // filtro anti-basura
+    tbTranscript.textContent = `Escuché: "${txt}"`;
+    evaluateAnswer(txt, conf);
+  };
+
+  rec.onerror = (ev) => {
+    // 'no-speech' y 'aborted' son normales
+    if (ev.error === 'no-speech'){
+      tbTranscript.textContent = 'No escuché nada. Intenta de nuevo.';
+    } else if (ev.error === 'not-allowed'){
+      tbTranscript.textContent = 'Permiso de micrófono denegado.';
+    } else if (ev.error !== 'aborted'){
+      tbTranscript.textContent = 'Error de micro: ' + ev.error;
+    }
+  };
+
+  rec.onend = () => {
+    teacher.listening = false;
+    teacher.waitingForSpeech = false;
+    if (teacher.silenceTimer) clearTimeout(teacher.silenceTimer);
+    tbLive.className = 'tb-live';
+    tbLive.textContent = '🎤 Micrófono libre';
+    // Si no hubo resultado tras 1.5s, avisar
+    if (!gotResult && teacher.active){
+      setTimeout(()=>{
+        if (teacher.active && !teacher.listening && !tbFeedback.classList.contains('ok') && !tbFeedback.classList.contains('ko') && !tbFeedback.classList.contains('partial')){
+          tbTranscript.textContent = 'No capté respuesta. Presiona 🎤 o escribe en la pizarra.';
+        }
+      }, 1500);
+    }
+  };
+
+  teacher.recognition = rec;
+  try {
+    rec.start();
+    // Timeout de silencio: 8 seg
+    teacher.silenceTimer = setTimeout(()=>{
+      if (teacher.listening && !gotResult){
+        try { rec.stop(); } catch(_){}
+      }
+    }, 8000);
+  } catch(e){
+    teacher.listening = false;
+  }
+}
+
+function stopListening(){
+  if (teacher.recognition){
+    try { teacher.recognition.abort(); } catch(_){}
+    teacher.recognition = null;
+  }
+  if (teacher.silenceTimer) { clearTimeout(teacher.silenceTimer); teacher.silenceTimer = null; }
+  teacher.listening = false;
+  teacher.waitingForSpeech = false;
+  tbLive.className = 'tb-live';
+  tbLive.textContent = '🎤 Micrófono libre';
+}
+
+btnMic.addEventListener('click', ()=>{
+  if (!teacher.active) return;
+  if (teacher.listening){
+    stopListening();
+  } else {
+    startListening();
   }
 });
-document.getElementById('pbOK').addEventListener('click', ()=>{
-  if (!langState.practice) return;
-  langState.progress.ok++;
-  markSeen(langState.practice.answer);
-  saveProgress(); refreshProgressUI();
-  status('✅ ¡Correcto!');
-  advancePractice();
-});
-document.getElementById('pbKO').addEventListener('click', ()=>{
-  if (!langState.practice) return;
-  langState.progress.ko++;
-  markSeen(langState.practice.answer);
-  saveProgress(); refreshProgressUI();
-  status('❌ Repite la palabra');
-  // Mostrar respuesta automáticamente
-  langState.practice.revealed = true;
-  pbWord.classList.remove('hidden-answer');
-  pbWord.textContent = langState.practice.answer;
-});
-document.getElementById('pbNext').addEventListener('click', advancePractice);
 
-function advancePractice(){
-  const p = langState.practice; if (!p) return;
-  if (p.onNext){ p.onNext(); }
-  else endPractice();
-}
-function markSeen(w){
-  if (!langState.progress.seen.includes(w)) langState.progress.seen.push(w);
+/* ---------- Evaluar respuesta ---------- */
+function evaluateAnswer(spoken, confidence){
+  if (!teacher.current) return;
+  stopListening();
+
+  const expected = teacher.current.expectAnswer;
+  const sim = similarity(spoken, expected);
+
+  tbFeedback.className = 'tb-feedback';
+  let feedback = '';
+  let color = '';
+
+  if (sim >= 0.85){
+    teacher.ok++;
+    color = 'ok';
+    feedback = `✅ ¡Excelente! "${expected}"`;
+    speak(pick(['¡Muy bien!','¡Perfecto!','¡Correcto!','¡Excelente pronunciación!']), 'es');
+  } else if (sim >= 0.6){
+    teacher.ok++;
+    color = 'partial';
+    feedback = `🟡 Casi. Escuché "${spoken}", era "${expected}"`;
+    speak(`Casi. La respuesta correcta es ${expected}`, 'es');
+  } else {
+    teacher.ko++;
+    color = 'ko';
+    feedback = `❌ Era "${expected}". Dijiste "${spoken}"`;
+    speak(`No exactamente. La respuesta correcta es ${expected}`, 'es');
+  }
+
+  tbFeedback.className = 'tb-feedback ' + color;
+  tbFeedback.textContent = feedback;
+  refreshTeacherUI();
+  setStatus(color==='ok'?'✅ Acierto':(color==='ko'?'❌ Fallo':'🟡 Casi'));
+
+  // Siguiente pregunta tras 2.5s
+  setTimeout(()=>{
+    if (teacher.active) nextQuestion();
+  }, 2500);
 }
 
-/* Atajos dentro del modo práctica */
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function setStatus(txt){
+  tbStatus.textContent = txt;
+}
+
+/* ---------- Botón abrir/cerrar profesor ---------- */
+document.getElementById('openTeacher').addEventListener('click', ()=>{
+  teacherBar.classList.toggle('open');
+});
+
+/* ---------- Cerrar con Escape ---------- */
 window.addEventListener('keydown', e=>{
-  if (!langState.practice) return;
-  if (e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
-  if (e.key === 'Enter'){ e.preventDefault(); advancePractice(); }
-  if (e.key === ' ' && e.target === document.body){ e.preventDefault(); document.getElementById('pbReveal').click(); }
-  if (e.key === 'Escape'){ endPractice(); }
+  if (e.key === 'Escape'){
+    if (teacherBar.classList.contains('open') && !teacher.active){
+      teacherBar.classList.remove('open');
+    }
+  }
 });
 
-/* --------- Init módulo idiomas --------- */
+/* ---------- Pre-cargar voces ---------- */
+if ('speechSynthesis' in window){
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = ()=>{};
+}
+
+/* ---------- Init ---------- */
 renderTab();
 refreshProgressUI();
 

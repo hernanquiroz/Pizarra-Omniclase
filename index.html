@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pizarra OmniClase</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { overflow: hidden; background: #fff; font-family: system-ui, sans-serif; touch-action: none; }
+  canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; touch-action: none; cursor: crosshair; }
+  #toolbar {
+    position: fixed; top: 12px; left: 12px; right: 12px; z-index: 10;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+    padding: 8px 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  button, input, select {
+    font: inherit; padding: 6px 12px; border: 1px solid #ccc; border-radius: 8px;
+    background: #f8f8f8; cursor: pointer; touch-action: manipulation;
+  }
+  button.active { background: #007aff; color: white; border-color: #007aff; }
+  input[type="color"] { width: 40px; height: 36px; padding: 2px; border: none; background: none; cursor: pointer; }
+  input[type="range"] { width: 100px; }
+  @media (max-width: 600px) {
+    #toolbar { top: 6px; left: 6px; right: 6px; padding: 6px; gap: 4px; }
+    button, input, select { padding: 4px 8px; font-size: 14px; }
+    input[type="range"] { width: 70px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="board"></canvas>
+<div id="toolbar">
+  <button id="pen" class="active" title="Lápiz">✏️</button>
+  <button id="eraser" title="Borrador">🧽</button>
+  <input type="color" id="color" value="#000000" title="Color">
+  <input type="range" id="size" min="1" max="30" value="3" title="Grosor">
+  <button id="undo" title="Deshacer">↩️</button>
+  <button id="redo" title="Rehacer">↪️</button>
+  <button id="clear" title="Limpiar">🗑️</button>
+  <button id="save" title="Guardar PNG">💾</button>
+</div>
+<script>
+(() => {
+  const canvas = document.getElementById('board');
+  const ctx = canvas.getContext('2d');
+  let strokes = [];
+  let redoStack = [];
+  let drawing = false;
+  let currentStroke = null;
+  let pointerId = null;
+  let tool = 'pen';
+  let color = '#000000';
+  let size = 3;
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    redraw();
+  }
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5
+    };
+  }
+
+  function drawSegment(stroke, from, to) {
+    ctx.save();
+    ctx.beginPath();
+    if (stroke.tool === 'eraser') {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = stroke.size * 2;
+    } else {
+      ctx.strokeStyle = stroke.color;
+      const p = stroke.pointerType === 'pen' ? (to.pressure || 0.5) : 1;
+      ctx.lineWidth = stroke.size * p * 1.5;
+    }
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function redraw() {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (const stroke of strokes) {
+      for (let i = 1; i < stroke.points.length; i++) {
+        drawSegment(stroke, stroke.points[i - 1], stroke.points[i]);
+      }
+    }
+  }
+
+  function startStroke(e) {
+    e.preventDefault();
+    if (pointerId !== null) return;
+    pointerId = e.pointerId;
+    canvas.setPointerCapture(e.pointerId);
+    drawing = true;
+    const pos = getPos(e);
+    currentStroke = {
+      tool,
+      color,
+      size,
+      pointerType: e.pointerType,
+      points: [{ x: pos.x, y: pos.y, pressure: pos.pressure }]
+    };
+    strokes.push(currentStroke);
+    redoStack = [];
+    if (currentStroke.points.length === 1) {
+      drawSegment(currentStroke, pos, pos);
+    }
+  }
+
+  function moveStroke(e) {
+    if (!drawing || e.pointerId !== pointerId || !currentStroke) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    const last = currentStroke.points[currentStroke.points.length - 1];
+    currentStroke.points.push({ x: pos.x, y: pos.y, pressure: pos.pressure });
+    drawSegment(currentStroke, last, pos);
+  }
+
+  function endStroke(e) {
+    if (e.pointerId !== pointerId) return;
+    drawing = false;
+    pointerId = null;
+    currentStroke = null;
+  }
+
+  canvas.addEventListener('pointerdown', startStroke);
+  canvas.addEventListener('pointermove', moveStroke);
+  canvas.addEventListener('pointerup', endStroke);
+  canvas.addEventListener('pointercancel', endStroke);
+
+  window.addEventListener('resize', resize);
+
+  const btnPen = document.getElementById('pen');
+  const btnEraser = document.getElementById('eraser');
+  const colorInput = document.getElementById('color');
+  const sizeInput = document.getElementById('size');
+  const btnUndo = document.getElementById('undo');
+  const btnRedo = document.getElementById('redo');
+  const btnClear = document.getElementById('clear');
+  const btnSave = document.getElementById('save');
+
+  btnPen.addEventListener('click', () => {
+    tool = 'pen';
+    btnPen.classList.add('active');
+    btnEraser.classList.remove('active');
+  });
+  btnEraser.addEventListener('click', () => {
+    tool = 'eraser';
+    btnEraser.classList.add('active');
+    btnPen.classList.remove('active');
+  });
+  colorInput.addEventListener('input', (e) => { color = e.target.value; });
+  sizeInput.addEventListener('input', (e) => { size = parseInt(e.target.value); });
+
+  btnUndo.addEventListener('click', () => {
+    if (strokes.length > 0) {
+      redoStack.push(strokes.pop());
+      redraw();
+    }
+  });
+  btnRedo.addEventListener('click', () => {
+    if (redoStack.length > 0) {
+      strokes.push(redoStack.pop());
+      redraw();
+    }
+  });
+  btnClear.addEventListener('click', () => {
+    if (confirm('¿Limpiar toda la pizarra?')) {
+      strokes = [];
+      redoStack = [];
+      redraw();
+    }
+  });
+  btnSave.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'pizarra.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  resize();
+})();
+</script>
+</body>
+</html>

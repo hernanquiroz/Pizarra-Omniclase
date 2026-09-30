@@ -8,9 +8,9 @@
 <title>Pizarra OmniClase · Profesor por Voz</title>
 <style>
   :root{
-    --bg:#fff; --fg:#111; --panel:rgba(255,255,255,.94);
-    --border:rgba(0,0,0,.08); --accent:#007aff; --ok:#34c759; --ko:#ff3b30;
-    --warn:#ff9500; --shadow:0 6px 24px rgba(0,0,0,.12);
+    --bg:#fff;--fg:#111;--panel:rgba(255,255,255,.94);--border:rgba(0,0,0,.08);
+    --accent:#007aff;--ok:#34c759;--ko:#ff3b30;--warn:#ff9500;
+    --shadow:0 6px 24px rgba(0,0,0,.12);
     --fs-ui:clamp(12px,1.1vw + .3vh,20px);
     --fs-small:clamp(10px,.9vw + .2vh,16px);
     --fs-btn:clamp(14px,1.4vw + .4vh,26px);
@@ -18,14 +18,12 @@
     --gap-ui:clamp(3px,.4vw + .2vh,10px);
     --radius:clamp(8px,.7vw + .4vh,18px);
     --btn-min:clamp(30px,3vw + 1.4vh,56px);
-    --safe-t:env(safe-area-inset-top,0px);
-    --safe-b:env(safe-area-inset-bottom,0px);
-    --safe-l:env(safe-area-inset-left,0px);
-    --safe-r:env(safe-area-inset-right,0px);
+    --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+    --safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px);
   }
   body.dark{--bg:#0f1115;--fg:#f2f2f2;--panel:rgba(26,29,36,.94);--border:rgba(255,255,255,.12);--shadow:0 6px 24px rgba(0,0,0,.5);}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;width:100%;overflow:hidden;overscroll-behavior:none;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:var(--fs-ui);background:var(--bg);color:var(--fg);-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  html,body{height:100%;width:100%;overflow:hidden;overscroll-behavior:none;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:var(--fs-ui);background:var(--bg);color:var(--fg);}
   canvas{display:block;position:fixed;inset:0;touch-action:none;cursor:crosshair;}
   #toolbar{position:fixed;top:calc(6px + var(--safe-t));left:calc(6px + var(--safe-l));right:calc(6px + var(--safe-r));z-index:20;display:flex;flex-wrap:wrap;gap:var(--gap-ui);align-items:center;background:var(--panel);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);padding:var(--pad-ui);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);max-height:calc(100vh - 20px);overflow-y:auto;}
   #toolbar.collapsed{transform:translateY(calc(-100% - var(--safe-t) - 6px));opacity:0;pointer-events:none;}
@@ -43,13 +41,12 @@
   #menuToggle{position:fixed;top:calc(8px + var(--safe-t));right:calc(8px + var(--safe-r));z-index:25;background:var(--panel);border:1px solid var(--border);border-radius:calc(var(--radius)*.8);width:var(--btn-min);height:var(--btn-min);display:none;align-items:center;justify-content:center;box-shadow:var(--shadow);font-size:var(--fs-btn);}
   #status{position:fixed;bottom:calc(8px + var(--safe-b));left:calc(8px + var(--safe-l));z-index:20;background:var(--panel);padding:calc(var(--pad-ui)*.6) calc(var(--pad-ui)*1.1);border-radius:calc(var(--radius)*.7);font-size:var(--fs-small);opacity:.85;pointer-events:none;border:1px solid var(--border);max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-  /* ============== PANEL IDIOMAS ============== */
-  #langPanel{position:fixed;top:calc(70px + var(--safe-t));right:calc(10px + var(--safe-r));width:min(400px,92vw);max-height:calc(100vh - 90px - var(--safe-b));background:var(--panel);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);z-index:30;display:flex;flex-direction:column;overflow:hidden;transform:translateX(110%);transition:transform .3s cubic-bezier(.2,.8,.2,1);}
+  #langPanel{position:fixed;top:calc(70px + var(--safe-t));right:calc(10px + var(--safe-r));width:min(400px,92vw);max-height:calc(100vh - 90px - var(--safe-b));background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);z-index:30;display:flex;flex-direction:column;overflow:hidden;transform:translateX(110%);transition:transform .3s cubic-bezier(.2,.8,.2,1);}
   #langPanel.open{transform:translateX(0);}
   #langPanel .lp-head{display:flex;justify-content:space-between;align-items:center;padding:calc(var(--pad-ui)*1.2) calc(var(--pad-ui)*1.4);border-bottom:1px solid var(--border);}
   #langPanel .lp-head h3{font-size:var(--fs-ui);}
   #langPanel .lp-head button{min-width:auto;min-height:auto;padding:4px 10px;font-size:var(--fs-btn);}
-  #langPanel .lp-langs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:calc(var(--pad-ui)) calc(var(--pad-ui)*1.4);border-bottom:1px solid var(--border);}
+  #langPanel .lp-langs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:var(--pad-ui) calc(var(--pad-ui)*1.4);border-bottom:1px solid var(--border);}
   #langPanel .lp-langs label{display:flex;flex-direction:column;gap:4px;font-size:var(--fs-small);opacity:.75;}
   #langPanel .lp-langs select{min-width:auto;min-height:auto;padding:6px 8px;font-size:var(--fs-small);background:rgba(127,127,127,.08);}
   #langPanel .lp-tabs{display:flex;gap:2px;padding:6px calc(var(--pad-ui)*1.4);border-bottom:1px solid var(--border);overflow-x:auto;}
@@ -63,17 +60,16 @@
   #langPanel .v-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
   #langPanel .v-src{font-size:var(--fs-small);opacity:.65;}
   #langPanel .v-tgt{font-size:var(--fs-ui);font-weight:600;word-break:break-word;}
-  #langPanel .v-actions{display:flex;gap:4px;}
   #langPanel .v-actions button{min-width:auto;min-height:auto;padding:6px 8px;font-size:var(--fs-btn);}
   #langPanel .verb-table{width:100%;border-collapse:collapse;font-size:var(--fs-small);margin-top:8px;}
   #langPanel .verb-table th,#langPanel .verb-table td{padding:5px 6px;border-bottom:1px solid var(--border);text-align:left;}
-  #langPanel h4.section{font-size:var(--fs-small);text-transform:uppercase;opacity:.6;margin:10px 0 6px;letter-spacing:.05em;}
+  #langPanel h4.section{font-size:var(--fs-small);text-transform:uppercase;opacity:.6;margin:10px 0 6px;}
 
-  /* ============== PROFESOR ============== */
-  #teacherBar{position:fixed;bottom:calc(10px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(200%);z-index:45;width:min(780px,96vw);background:var(--panel);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:calc(var(--pad-ui)*1.3) calc(var(--pad-ui)*1.5);display:flex;flex-direction:column;gap:10px;transition:transform .35s cubic-bezier(.2,.8,.2,1);}
+  /* ====== PROFESOR ====== */
+  #teacherBar{position:fixed;bottom:calc(10px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(200%);z-index:45;width:min(820px,96vw);background:var(--panel);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:calc(var(--pad-ui)*1.3) calc(var(--pad-ui)*1.5);display:flex;flex-direction:column;gap:10px;transition:transform .35s cubic-bezier(.2,.8,.2,1);}
   #teacherBar.open{transform:translateX(-50%) translateY(0);}
   #teacherBar .tb-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  #teacherBar .tb-avatar{width:clamp(36px,3.5vw + 1vh,56px);height:clamp(36px,3.5vw + 1vh,56px);border-radius:50%;background:linear-gradient(135deg,var(--accent),#5856d6);display:flex;align-items:center;justify-content:center;font-size:clamp(18px,2vw + .5vh,28px);flex-shrink:0;transition:transform .2s;}
+  #teacherBar .tb-avatar{width:clamp(36px,3.5vw + 1vh,56px);height:clamp(36px,3.5vw + 1vh,56px);border-radius:50%;background:linear-gradient(135deg,var(--accent),#5856d6);display:flex;align-items:center;justify-content:center;font-size:clamp(18px,2vw + .5vh,28px);flex-shrink:0;}
   #teacherBar .tb-avatar.talking{animation:pulse 1.2s infinite;}
   @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,122,255,.5);}50%{transform:scale(1.06);box-shadow:0 0 0 12px rgba(0,122,255,0);}}
   #teacherBar .tb-info{display:flex;flex-direction:column;min-width:0;flex:1;}
@@ -85,22 +81,34 @@
   #teacherBar .tb-live .dot{width:8px;height:8px;border-radius:50%;background:var(--ko);animation:blink .8s infinite;}
   @keyframes blink{50%{opacity:.2;}}
 
-  #teacherBar .tb-question{background:rgba(0,122,255,.08);border:1px solid rgba(0,122,255,.25);border-radius:calc(var(--radius)*.8);padding:10px 14px;font-size:clamp(15px,1.5vw + .5vh,24px);line-height:1.4;font-weight:500;}
-  #teacherBar .tb-question .q-lang{font-size:var(--fs-small);opacity:.6;display:block;margin-bottom:4px;text-transform:uppercase;}
-  #teacherBar .tb-transcript{background:rgba(127,127,127,.08);border-radius:calc(var(--radius)*.8);padding:8px 12px;font-size:var(--fs-small);min-height:1.6em;font-style:italic;opacity:.85;}
+  #teacherBar .tb-question{background:rgba(0,122,255,.08);border:1px solid rgba(0,122,255,.25);border-radius:calc(var(--radius)*.8);padding:12px 16px;font-size:clamp(14px,1.4vw + .5vh,22px);line-height:1.5;}
+  #teacherBar .tb-question .q-lang{font-size:var(--fs-small);opacity:.6;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;}
+  #teacherBar .tb-question .q-prompt{display:block;font-weight:500;}
+  #teacherBar .tb-question .q-word{display:block;font-size:clamp(22px,2.6vw + 1vh,42px);font-weight:800;margin-top:10px;color:var(--accent);letter-spacing:.02em;word-break:break-word;}
+  #teacherBar .tb-question .q-word.hidden{filter:blur(10px);user-select:none;}
+  #teacherBar .tb-question .q-sub{display:block;font-size:var(--fs-small);opacity:.7;margin-top:6px;font-style:italic;}
+
+  #teacherBar .tb-transcript{background:rgba(127,127,127,.08);border-radius:calc(var(--radius)*.8);padding:8px 12px;font-size:var(--fs-small);min-height:1.6em;font-style:italic;opacity:.9;}
   #teacherBar .tb-feedback{font-size:var(--fs-ui);font-weight:600;padding:6px 2px;display:none;}
   #teacherBar .tb-feedback.ok{color:var(--ok);display:block;}
   #teacherBar .tb-feedback.ko{color:var(--ko);display:block;}
   #teacherBar .tb-feedback.partial{color:var(--warn);display:block;}
+
+  #teacherBar .tb-inputrow{display:flex;gap:6px;align-items:stretch;}
+  #teacherBar .tb-inputrow input{flex:1;min-height:calc(var(--btn-min)*.85);font-size:var(--fs-ui);padding:8px 12px;border-radius:10px;background:rgba(127,127,127,.08);}
+  #teacherBar .tb-inputrow button{min-width:auto;padding:8px 16px;border-radius:10px;background:var(--accent);color:#fff;border-color:var(--accent);}
+
   #teacherBar .tb-actions{display:flex;gap:6px;flex-wrap:wrap;}
   #teacherBar .tb-actions button{min-width:auto;min-height:auto;padding:8px 14px;font-size:var(--fs-small);border-radius:10px;}
   #teacherBar .tb-actions .primary{background:var(--accent);color:#fff;border-color:var(--accent);}
   #teacherBar .tb-actions .rec{background:var(--ko);color:#fff;border-color:var(--ko);}
   #teacherBar .tb-actions .ok{background:var(--ok);color:#fff;border-color:var(--ok);}
   #teacherBar .tb-actions .warn{background:var(--warn);color:#fff;border-color:var(--warn);}
+  #teacherBar .tb-actions .pulse{animation:pulse 1.4s infinite;}
+
   #teacherBar .tb-progress{font-size:var(--fs-small);opacity:.65;display:flex;gap:14px;flex-wrap:wrap;}
-  #teacherBar .tb-manual{display:none;gap:6px;padding-top:4px;border-top:1px dashed var(--border);}
-  #teacherBar .tb-manual.show{display:flex;flex-wrap:wrap;}
+  #teacherBar .tb-manual{display:none;gap:6px;padding-top:8px;border-top:1px dashed var(--border);align-items:center;flex-wrap:wrap;}
+  #teacherBar .tb-manual.show{display:flex;}
 
   @media (max-width:640px){
     #toolbar{gap:3px;padding:4px;}
@@ -121,14 +129,14 @@
 
 <div id="toolbar">
   <div class="group">
-    <button id="t-pen" class="active" title="Lápiz">✏️</button>
-    <button id="t-high" title="Resaltador">🖍️</button>
-    <button id="t-eraser" title="Borrador">🧽</button>
+    <button id="t-pen" class="active">✏️</button>
+    <button id="t-high">🖍️</button>
+    <button id="t-eraser">🧽</button>
     <button id="t-line" class="hide-xs">╱</button>
     <button id="t-rect" class="hide-xs">▭</button>
     <button id="t-circle" class="hide-xs">◯</button>
     <button id="t-arrow" class="hide-xs">→</button>
-    <button id="t-text" title="Texto">T</button>
+    <button id="t-text">T</button>
   </div>
   <div class="group">
     <input type="color" id="color" value="#111111">
@@ -140,7 +148,7 @@
   </div>
   <div class="group">
     <select id="bg">
-      <option value="blank">En blanco</option>
+      <option value="blank">Blanco</option>
       <option value="grid">Cuadrícula</option>
       <option value="lines">Líneas</option>
       <option value="dots">Puntos</option>
@@ -157,9 +165,9 @@
     <button id="next">▶</button><button id="addPage">＋</button>
   </div>
   <div class="group">
-    <button id="openLang" title="Idiomas">🌍</button>
-    <button id="openTeacher" title="Profesor por voz">🎓</button>
-    <button id="save" title="PNG">💾</button>
+    <button id="openLang">🌍</button>
+    <button id="openTeacher">🎓</button>
+    <button id="save">💾</button>
     <button id="saveJson" class="hide-md">📁</button>
     <button id="loadJson" class="hide-md">📂</button>
     <button id="full">⛶</button>
@@ -191,21 +199,28 @@
 
 <div id="teacherBar">
   <div class="tb-head">
-    <div class="tb-avatar" id="tbAvatar">👩‍🏫</div>
+    <div class="tb-avatar" id="tbAvatar">👨‍🏫</div>
     <div class="tb-info">
-      <span class="tb-name">Profesora OmniClase</span>
-      <span class="tb-status" id="tbStatus">Lista para empezar</span>
+      <span class="tb-name">Profesor OmniClase</span>
+      <span class="tb-status" id="tbStatus">Listo para empezar</span>
     </div>
     <div class="tb-live" id="tbLive">💤 En espera</div>
   </div>
 
   <div class="tb-question">
     <span class="q-lang" id="tbQLang">Pregunta</span>
-    <span id="tbQuestion">Presiona "Comenzar clase" para empezar.</span>
+    <span class="q-prompt" id="tbPrompt">Presiona "Comenzar clase" para empezar.</span>
+    <span class="q-word" id="tbWord" style="display:none">—</span>
+    <span class="q-sub" id="tbSub"></span>
   </div>
 
-  <div class="tb-transcript" id="tbTranscript">Aquí verás lo que el profe escucha…</div>
+  <div class="tb-transcript" id="tbTranscript">Aquí verás lo que el profesor escucha…</div>
   <div class="tb-feedback" id="tbFeedback"></div>
+
+  <div class="tb-inputrow">
+    <input type="text" id="tbInput" placeholder="O escribe tu respuesta aquí y presiona Enter…">
+    <button id="tbSend">Enviar</button>
+  </div>
 
   <div class="tb-progress">
     <span>🏆 Aciertos: <b id="tbOK">0</b></span>
@@ -216,16 +231,16 @@
   <div class="tb-actions">
     <button id="tbStart" class="primary">▶ Comenzar clase</button>
     <button id="tbRepeat">🔁 Repetir</button>
-    <button id="tbMic" class="rec" disabled>🎤 Hablar</button>
-    <button id="tbReveal" disabled>👁 Ver</button>
-    <button id="tbSkip" disabled>⏭ Siguiente</button>
-    <button id="tbStop" disabled>✕ Detener</button>
+    <button id="tbMic" class="rec">🎤 Responder por voz</button>
+    <button id="tbReveal">👁 Ver</button>
+    <button id="tbSkip">⏭ Siguiente</button>
+    <button id="tbStop">✕ Detener</button>
   </div>
 
   <div class="tb-manual" id="tbManual">
-    <span style="font-size:var(--fs-small);opacity:.7;align-self:center">Si el micro falla, evalúa tú:</span>
-    <button id="tbManualOK" class="ok">✓ Lo dije bien</button>
-    <button id="tbManualKO" class="warn">✗ Lo dije mal</button>
+    <span style="font-size:var(--fs-small);opacity:.7">Si el micro falla, marca tú:</span>
+    <button id="tbManualOK" class="ok">✓ Correcto</button>
+    <button id="tbManualKO" class="warn">✗ Fallé</button>
   </div>
 </div>
 
@@ -356,17 +371,12 @@ if (window.matchMedia('(max-width:640px)').matches){ toolbar.addEventListener('c
 window.addEventListener('keydown', e=>{ if (e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return; if (e.ctrlKey||e.metaKey){ if (e.key==='z'){e.preventDefault();undo();return;} if (e.key==='y'){e.preventDefault();redo();return;} return; } const map={p:'pen',h:'high',e:'eraser',l:'line',r:'rect',o:'circle',a:'arrow',t:'text'}; const k=e.key.toLowerCase(); if (map[k]) setTool(map[k]); });
 let statusTimer=null;
 function status(m){ statusEl.textContent=m; clearTimeout(statusTimer); statusTimer = setTimeout(()=>statusEl.textContent='Listo · Pizarra OmniClase',2500); }
-function autosave(){ try{localStorage.setItem('omniclase_v5',JSON.stringify({pages:state.pages,pageIndex:state.pageIndex,bg:state.bg,dark:state.dark}));}catch(_){} }
-function loadAutosave(){ try{ const raw = localStorage.getItem('omniclase_v5'); if (!raw) return; const d = JSON.parse(raw); if (d.pages && d.pages.length){ state.pages=d.pages; state.pageIndex=d.pageIndex||0; state.bg=d.bg||'blank'; state.dark=!!d.dark; document.getElementById('bg').value = state.bg; document.body.classList.toggle('dark',state.dark); } }catch(_){} }
+function autosave(){ try{localStorage.setItem('omniclase_v6',JSON.stringify({pages:state.pages,pageIndex:state.pageIndex,bg:state.bg,dark:state.dark}));}catch(_){} }
+function loadAutosave(){ try{ const raw = localStorage.getItem('omniclase_v6'); if (!raw) return; const d = JSON.parse(raw); if (d.pages && d.pages.length){ state.pages=d.pages; state.pageIndex=d.pageIndex||0; state.bg=d.bg||'blank'; state.dark=!!d.dark; document.getElementById('bg').value = state.bg; document.body.classList.toggle('dark',state.dark); } }catch(_){} }
 loadAutosave(); updatePageLabel(); setTool('pen'); resize();
 
 /* ==================== DATOS ==================== */
-const LANGS = {
-  es:{name:'Español',voice:'es-ES',flag:'🇪🇸'},
-  en:{name:'English',voice:'en-US',flag:'🇬🇧'},
-  fr:{name:'Français',voice:'fr-FR',flag:'🇫🇷'},
-  pt:{name:'Português',voice:'pt-BR',flag:'🇧🇷'}
-};
+const LANGS = { es:{name:'Español',voice:'es-ES',flag:'🇪🇸'}, en:{name:'English',voice:'en-US',flag:'🇬🇧'}, fr:{name:'Français',voice:'fr-FR',flag:'🇫🇷'}, pt:{name:'Português',voice:'pt-BR',flag:'🇧🇷'} };
 const VOCAB = {
   saludos:{label:'Saludos',items:[{es:'Hola',en:'Hello',fr:'Bonjour',pt:'Olá'},{es:'Buenos días',en:'Good morning',fr:'Bonjour',pt:'Bom dia'},{es:'Buenas tardes',en:'Good afternoon',fr:'Bon après-midi',pt:'Boa tarde'},{es:'Buenas noches',en:'Good night',fr:'Bonne nuit',pt:'Boa noite'},{es:'Adiós',en:'Goodbye',fr:'Au revoir',pt:'Adeus'},{es:'Por favor',en:'Please',fr:"S'il vous plaît",pt:'Por favor'},{es:'Gracias',en:'Thank you',fr:'Merci',pt:'Obrigado'},{es:'De nada',en:"You're welcome",fr:'De rien',pt:'De nada'},{es:'Perdón',en:'Sorry',fr:'Pardon',pt:'Desculpe'},{es:'¿Cómo estás?',en:'How are you?',fr:'Comment vas-tu ?',pt:'Como você está?'},{es:'Bien',en:'Fine',fr:'Bien',pt:'Bem'},{es:'Mucho gusto',en:'Nice to meet you',fr:'Enchanté',pt:'Prazer em conhecer'}]},
   numeros:{label:'Números',items:[{es:'Uno',en:'One',fr:'Un',pt:'Um'},{es:'Dos',en:'Two',fr:'Deux',pt:'Dois'},{es:'Tres',en:'Three',fr:'Trois',pt:'Três'},{es:'Cuatro',en:'Four',fr:'Quatre',pt:'Quatro'},{es:'Cinco',en:'Five',fr:'Cinq',pt:'Cinco'},{es:'Seis',en:'Six',fr:'Six',pt:'Seis'},{es:'Siete',en:'Seven',fr:'Sept',pt:'Sete'},{es:'Ocho',en:'Eight',fr:'Huit',pt:'Oito'},{es:'Nueve',en:'Nine',fr:'Neuf',pt:'Nove'},{es:'Diez',en:'Ten',fr:'Dix',pt:'Dez'},{es:'Veinte',en:'Twenty',fr:'Vingt',pt:'Vinte'},{es:'Cien',en:'One hundred',fr:'Cent',pt:'Cem'}]},
@@ -415,21 +425,18 @@ function loadProgress(){ try{ const raw = localStorage.getItem('omniclase_lang')
 function saveProgress(){ try{ localStorage.setItem('omniclase_lang', JSON.stringify(langState.progress)); }catch(_){} }
 function refreshProgressUI(){ document.getElementById('lpOK').textContent = langState.progress.ok; document.getElementById('lpKO').textContent = langState.progress.ko; document.getElementById('lpSeen').textContent = langState.progress.seen.length; }
 
-/* ==================== PANEL IDIOMAS ==================== */
 const langPanel = document.getElementById('langPanel');
 const lpBody = document.getElementById('lpBody');
 const lpTabs = document.getElementById('lpTabs');
 const srcSel = document.getElementById('langSource');
 const tgtSel = document.getElementById('langTarget');
 Object.entries(LANGS).forEach(([k,v])=>{ srcSel.innerHTML += `<option value="${k}">${v.flag} ${v.name}</option>`; tgtSel.innerHTML += `<option value="${k}">${v.flag} ${v.name}</option>`; });
-srcSel.value = langState.source;
-tgtSel.value = langState.target;
+srcSel.value = langState.source; tgtSel.value = langState.target;
 document.getElementById('openLang').addEventListener('click',()=>{ langPanel.classList.toggle('open'); if (langPanel.classList.contains('open')) renderTab(); });
 document.getElementById('lpClose').addEventListener('click',()=>langPanel.classList.remove('open'));
 srcSel.addEventListener('change',e=>{ langState.source=e.target.value; renderTab(); });
 tgtSel.addEventListener('change',e=>{ langState.target=e.target.value; renderTab(); });
 lpTabs.addEventListener('click', e=>{ const btn = e.target.closest('button'); if (!btn) return; lpTabs.querySelectorAll('button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); langState.activeTab=btn.dataset.tab; renderTab(); });
-
 function renderTab(){ lpBody.innerHTML=''; if (langState.activeTab==='vocab') renderVocab(); else if (langState.activeTab==='phrases') renderPhrases(); else if (langState.activeTab==='verbos') renderVerbos(); refreshProgressUI(); }
 function renderVocab(){
   const cats = Object.entries(VOCAB);
@@ -439,10 +446,9 @@ function renderVocab(){
   VOCAB[langState.activeCategory].items.forEach(it=>{
     const src = it[langState.source], tgt = it[langState.target];
     if (!src||!tgt) return;
-    const el = document.createElement('div');
-    el.className = 'v-item';
+    const el = document.createElement('div'); el.className = 'v-item';
     el.innerHTML = `<div class="v-text"><span class="v-src">${src}</span><span class="v-tgt">${tgt}</span></div><div class="v-actions"><button data-act="speak">🔊</button></div>`;
-    el.querySelector('[data-act="speak"]').addEventListener('click', ()=>{ speakSafe(tgt, langState.target); });
+    el.querySelector('[data-act="speak"]').addEventListener('click', ()=>speakSafe(tgt, langState.target));
     list.appendChild(el);
   });
 }
@@ -455,35 +461,55 @@ function renderVerbos(){
   const v = VERB_TABLES[langState.activeVerb];
   const keys = ['es','en','fr','pt'];
   const head = keys.map(k=>`<th>${LANGS[k].flag}</th>`).join('');
-  const rows = PRONOUNS.map((p,i)=>{ return `<tr><th>${p}</th>${keys.map(k=>`<td>${v[k][i]}</td>`).join('')}</tr>`; }).join('');
+  const rows = PRONOUNS.map((p,i)=>`<tr><th>${p}</th>${keys.map(k=>`<td>${v[k][i]}</td>`).join('')}</tr>`).join('');
   const selectors = Object.entries(VERB_TABLES).map(([k,val])=>`<button data-verb="${k}" class="${k===langState.activeVerb?'active':''}">${val.label}</button>`).join('');
   lpBody.innerHTML = `<h4 class="section">Conjugación presente</h4><div class="cat-list" id="verbList">${selectors}</div><table class="verb-table"><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
   lpBody.querySelector('#verbList').addEventListener('click', e=>{ const btn = e.target.closest('button'); if (!btn) return; langState.activeVerb = btn.dataset.verb; renderVerbos(); });
 }
 
-/* ==================== VOZ (robusta) ==================== */
+/* ==================== VOZ ==================== */
 let voicesCache = [];
 function refreshVoices(){ if ('speechSynthesis' in window) voicesCache = speechSynthesis.getVoices(); }
 if ('speechSynthesis' in window){ refreshVoices(); speechSynthesis.onvoiceschanged = refreshVoices; }
 
-/* Hablar: devuelve Promesa que SIEMPRE resuelve (por onend, onerror o timeout) */
+/* Buscar mejor voz masculina disponible en el idioma */
+function pickVoice(lang){
+  const ls = voicesCache.filter(v => v.lang.toLowerCase().startsWith(lang));
+  if (!ls.length) return null;
+  // Preferir voces con "male" en el nombre, si no hay, usar la primera
+  const male = ls.find(v => /male|diego|jorge|carlos|pablo|juan|enrique|daniel|thomas|paul|marco|guy|nicolas/i.test(v.name));
+  return male || ls[0];
+}
+
 function speakSafe(text, lang){
   return new Promise(resolve=>{
     if (!('speechSynthesis' in window)){ resolve(); return; }
     try { speechSynthesis.cancel(); } catch(_){}
     const u = new SpeechSynthesisUtterance(text);
     u.lang = LANGS[lang]?.voice || 'es-ES';
-    u.rate = .9; u.pitch = 1.05;
-    const v = voicesCache.find(vv => vv.lang.toLowerCase().startsWith(lang));
+    u.rate = .9; u.pitch = .9; /* pitch bajo → más masculino */
+    const v = pickVoice(lang);
     if (v) u.voice = v;
     let done = false;
-    const fin = () => { if (done) return; done = true; clearTimeout(fallback); resolve(); };
+    const fin = () => { if (done) return; done = true; clearTimeout(fb); resolve(); };
     u.onend = fin; u.onerror = fin;
-    const fallback = setTimeout(fin, Math.max(2500, text.length * 110) + 2000);
+    const fb = setTimeout(fin, Math.max(2500, text.length * 110) + 2500);
     try { speechSynthesis.speak(u); } catch(e){ fin(); }
   });
 }
 function stopSpeaking(){ try{ speechSynthesis.cancel(); }catch(_){} }
+function beep(freq=880, dur=0.12){
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(.001, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.15, ac.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + dur);
+    o.connect(g); g.connect(ac.destination);
+    o.start(); o.stop(ac.currentTime + dur + 0.02);
+  } catch(_){}
+}
 
 /* ==================== PROFESOR ==================== */
 const teacherBar = document.getElementById('teacherBar');
@@ -491,55 +517,48 @@ const tbAvatar = document.getElementById('tbAvatar');
 const tbStatus = document.getElementById('tbStatus');
 const tbLive = document.getElementById('tbLive');
 const tbQLang = document.getElementById('tbQLang');
-const tbQuestion = document.getElementById('tbQuestion');
+const tbPrompt = document.getElementById('tbPrompt');
+const tbWord = document.getElementById('tbWord');
+const tbSub = document.getElementById('tbSub');
 const tbTranscript = document.getElementById('tbTranscript');
 const tbFeedback = document.getElementById('tbFeedback');
 const tbOK = document.getElementById('tbOK');
 const tbKO = document.getElementById('tbKO');
 const tbRound = document.getElementById('tbRound');
 const tbManual = document.getElementById('tbManual');
+const tbInput = document.getElementById('tbInput');
 const btnStart = document.getElementById('tbStart');
 const btnRepeat = document.getElementById('tbRepeat');
 const btnMic = document.getElementById('tbMic');
 const btnReveal = document.getElementById('tbReveal');
 const btnSkip = document.getElementById('tbSkip');
 const btnStop = document.getElementById('tbStop');
+const btnSend = document.getElementById('tbSend');
 const btnManualOK = document.getElementById('tbManualOK');
 const btnManualKO = document.getElementById('tbManualKO');
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 const teacher = {
-  active: false,
-  current: null,
-  round: 0,
-  maxRound: 10,
-  ok: 0,
-  ko: 0,
-  recognition: null,
-  listening: false,
-  state: 'idle', // idle | speaking | waiting | listening | evaluating | feedback
-  timeouts: [],
-  silenceTimer: null,
-  micPermissionGranted: false
+  active: false, current: null, round: 0, maxRound: 10, ok: 0, ko: 0,
+  recognition: null, listening: false, state: 'idle',
+  timeouts: [], silenceTimer: null, micPermissionGranted: false,
+  feedbackPending: false
 };
 
-/* --- Utilidades de tiempo --- */
 function later(fn, ms){ const t = setTimeout(fn, ms); teacher.timeouts.push(t); return t; }
 function clearLater(){ teacher.timeouts.forEach(t => clearTimeout(t)); teacher.timeouts = []; if (teacher.silenceTimer){ clearTimeout(teacher.silenceTimer); teacher.silenceTimer = null; } }
 function setLive(cls, txt){ tbLive.className = 'tb-live' + (cls?' '+cls:''); tbLive.innerHTML = (cls==='rec'?'<span class="dot"></span> ':'') + txt; }
 function setStatus(txt){ tbStatus.textContent = txt; }
 
-/* --- Normalizar y comparar --- */
 function normalize(str){ return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¿?¡!.,;:"'`´\-]/g,'').replace(/\s+/g,' ').trim(); }
 function levenshtein(a,b){ if (a===b) return 0; if (!a.length) return b.length; if (!b.length) return a.length; const m=[]; for (let i=0;i<=b.length;i++) m[i]=[i]; for (let j=0;j<=a.length;j++) m[0][j]=j; for (let i=1;i<=b.length;i++) for (let j=1;j<=a.length;j++) m[i][j] = b[i-1]===a[j-1] ? m[i-1][j-1] : Math.min(m[i-1][j-1]+1,m[i][j-1]+1,m[i-1][j]+1); return m[b.length][a.length]; }
 function similarity(a,b){ a=normalize(a); b=normalize(b); if (!a && !b) return 1; const d = levenshtein(a,b); const mx = Math.max(a.length,b.length); return mx===0?1:1-d/mx; }
 
-/* --- Palabras --- */
 function allWords(){ const a=[]; Object.values(VOCAB).forEach(c=>c.items.forEach(i=>a.push(i))); return a; }
 function randomWord(){ const a=allWords(); return a[Math.floor(Math.random()*a.length)]; }
 
-/* --- Construir pregunta --- */
+/* --------- Construir pregunta — CON PALABRA VISIBLE --------- */
 function buildQuestion(){
   const src = langState.source, tgt = langState.target;
   const w = randomWord();
@@ -547,12 +566,45 @@ function buildQuestion(){
   if (!fromWord || !toWord || src === tgt) return buildQuestion();
   const types = ['traduce','pronuncia','repite'];
   const type = types[Math.floor(Math.random()*types.length)];
-  if (type === 'traduce') return { type, promptText:`¿Cómo se dice "${fromWord}" en ${LANGS[tgt].name}?`, expectAnswer: toWord, answerLang: tgt };
-  if (type === 'pronuncia') return { type, promptText:`Pronuncia esta palabra: "${toWord}"`, expectAnswer: toWord, answerLang: tgt };
-  return { type:'repite', promptText:`Repite después de mí:`, expectAnswer: toWord, answerLang: tgt };
+
+  if (type === 'traduce'){
+    return {
+      type,
+      promptLabel: `Traduce al ${LANGS[tgt].name}`,
+      promptText: `¿Cómo se dice "${fromWord}"?`,
+      wordShown: fromWord,        // se muestra la palabra en idioma origen
+      wordHidden: false,
+      expectAnswer: toWord,
+      answerLang: tgt,
+      speakPrompt: `¿Cómo se dice ${fromWord} en ${LANGS[tgt].name}?`
+    };
+  }
+  if (type === 'pronuncia'){
+    return {
+      type,
+      promptLabel: `Pronuncia en ${LANGS[tgt].name}`,
+      promptText: `Lee en voz alta esta palabra:`,
+      wordShown: toWord,          // se muestra la palabra objetivo
+      wordHidden: false,
+      expectAnswer: toWord,
+      answerLang: tgt,
+      speakPrompt: `Pronuncia esta palabra en ${LANGS[tgt].name}`
+    };
+  }
+  // repite
+  return {
+    type:'repite',
+    promptLabel: `Repite en ${LANGS[tgt].name}`,
+    promptText: `Escucha y repite después de mí:`,
+    wordShown: toWord,            // ← AHORA SÍ SE MUESTRA LA PALABRA
+    wordHidden: false,
+    expectAnswer: toWord,
+    answerLang: tgt,
+    speakPrompt: null             // no hablar en español
+  };
 }
 
-/* --- Pedir permiso de micrófono --- */
+/* --------- Micrófono --------- */
 async function ensureMicPermission(){
   if (teacher.micPermissionGranted) return true;
   try {
@@ -561,47 +613,53 @@ async function ensureMicPermission(){
     teacher.micPermissionGranted = true;
     return true;
   } catch(e){
-    tbTranscript.textContent = '⚠️ Debes permitir el micrófono en tu navegador.';
+    tbTranscript.textContent = '⚠️ Debes permitir el micrófono.';
     return false;
   }
 }
 
-/* --- Destruir reconocimiento previo --- */
 function destroyRecognition(){
   if (teacher.recognition){
-    try { teacher.recognition.onend = null; teacher.recognition.onresult = null; teacher.recognition.onerror = null; teacher.recognition.abort(); } catch(_){}
+    try {
+      teacher.recognition.onend = null;
+      teacher.recognition.onresult = null;
+      teacher.recognition.onerror = null;
+      teacher.recognition.abort();
+    } catch(_){}
     teacher.recognition = null;
   }
   teacher.listening = false;
 }
 
-/* --- Iniciar reconocimiento --- */
 function startListening(){
   if (!teacher.active || !SR) return;
   destroyRecognition();
-  stopSpeaking(); // garantiza que la síntesis no bloquee el micrófono
-  
-  setLive('', '🎤 Preparando micrófono…');
+  stopSpeaking();
+
+  setLive('', '🎤 Preparando…');
   tbTranscript.textContent = 'Preparando micrófono…';
-  tbManual.classList.add('show');
   teacher.state = 'listening';
   setStatus('🎤 Escuchando…');
+  tbManual.classList.add('show');
+  btnMic.classList.add('pulse');
 
-  // Delay para que el sistema libere el canal de audio tras la síntesis
   later(()=>{
-    if (!teacher.active){ return; }
+    if (!teacher.active) return;
+    try { beep(880, 0.1); } catch(_){}
+    later(()=>beep(1175, 0.1), 130);
+
     const rec = new SR();
     rec.lang = LANGS[langState.target].voice;
     rec.continuous = false;
     rec.interimResults = false;
     rec.maxAlternatives = 1;
-
     let gotResult = false;
 
     rec.onstart = () => {
       teacher.listening = true;
       setLive('rec', '🎤 Escuchando…');
       tbTranscript.textContent = '🎤 Di tu respuesta ahora…';
+      btnMic.classList.remove('pulse');
       setStatus('🎤 Escuchando…');
     };
     rec.onresult = (e) => {
@@ -612,23 +670,25 @@ function startListening(){
       evaluateAnswer(txt);
     };
     rec.onerror = (ev) => {
-      if (ev.error === 'no-speech'){ tbTranscript.textContent = 'No escuché nada. Puedes intentar de nuevo con 🎤 o evaluarte tú con ✅/❌.'; }
-      else if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){ tbTranscript.textContent = '⚠️ Permiso de micrófono denegado.'; }
-      else if (ev.error === 'aborted'){ /* silencio */ }
-      else { tbTranscript.textContent = 'Error de micro: ' + ev.error; }
+      btnMic.classList.remove('pulse');
+      if (ev.error === 'no-speech') tbTranscript.textContent = 'No escuché nada. Presiona 🎤 para reintentar.';
+      else if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') tbTranscript.textContent = '⚠️ Permiso de micrófono denegado.';
+      else if (ev.error === 'aborted'){ /* silencioso */ }
+      else if (ev.error === 'network') tbTranscript.textContent = '⚠️ Error de red. Chrome necesita internet para reconocer voz.';
+      else tbTranscript.textContent = 'Error de micro: ' + ev.error;
     };
     rec.onend = () => {
       teacher.listening = false;
+      btnMic.classList.remove('pulse');
       setLive('', '🎤 Micrófono libre');
-      if (!gotResult && teacher.active){
-        tbTranscript.textContent = 'No capté respuesta. Pulsa 🎤 para reintentar, o evalúate con ✅/❌.';
+      if (!gotResult && teacher.active && !teacher.feedbackPending){
+        tbTranscript.textContent = 'No capté respuesta. Presiona 🎤 o escribe la respuesta abajo.';
       }
     };
 
     teacher.recognition = rec;
     try {
       rec.start();
-      // Timeout de seguridad: 9s sin resultados
       teacher.silenceTimer = setTimeout(()=>{
         if (teacher.listening && !gotResult && teacher.recognition){
           try { teacher.recognition.stop(); } catch(_){}
@@ -636,36 +696,26 @@ function startListening(){
       }, 9000);
     } catch(e){
       teacher.listening = false;
-      tbTranscript.textContent = 'No se pudo iniciar el micrófono: ' + e.message;
+      tbTranscript.textContent = 'No se pudo iniciar el micro: ' + e.message;
+      btnMic.classList.remove('pulse');
     }
   }, 700);
 }
 
-/* --- Detener reconocimiento --- */
 function stopListening(){
   if (teacher.silenceTimer){ clearTimeout(teacher.silenceTimer); teacher.silenceTimer = null; }
   destroyRecognition();
+  btnMic.classList.remove('pulse');
   setLive('', '🎤 Micrófono libre');
 }
 
-/* --- Estado y botones --- */
 function refreshTeacherUI(){ tbOK.textContent = teacher.ok; tbKO.textContent = teacher.ko; tbRound.textContent = teacher.round; }
-function enableButtons(enabled){
-  btnMic.disabled = !enabled;
-  btnReveal.disabled = !enabled;
-  btnSkip.disabled = !enabled;
-}
+function enableButtons(enabled){ btnMic.disabled = !enabled; btnReveal.disabled = !enabled; btnSkip.disabled = !enabled; }
 
-/* --- Iniciar clase --- */
+/* --------- Iniciar clase --------- */
 btnStart.addEventListener('click', async ()=>{
-  if (!SR){
-    alert('Tu navegador no soporta reconocimiento de voz.\nUsa Chrome o Edge en PC/Android.');
-    return;
-  }
-  if (!('speechSynthesis' in window)){
-    alert('Tu navegador no soporta síntesis de voz.');
-    return;
-  }
+  if (!SR){ alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.'); return; }
+  if (!('speechSynthesis' in window)){ alert('Tu navegador no soporta síntesis de voz.'); return; }
   const ok = await ensureMicPermission();
   if (!ok) return;
   teacher.active = true;
@@ -676,9 +726,11 @@ btnStart.addEventListener('click', async ()=>{
   btnStop.disabled = false;
   teacherBar.classList.add('open');
   tbManual.classList.remove('show');
+  tbInput.value = '';
   setStatus('Iniciando clase…');
-  setLive('speak', '🔊 Profe hablando…');
-  await speakSafe(`Hola, soy tu profesora de ${LANGS[langState.target].name}. Vamos a empezar.`, 'es');
+  tbAvatar.textContent = '👨‍🏫';
+  setLive('speak', '🔊 Profesor hablando…');
+  await speakSafe(`Hola, soy tu profesor de ${LANGS[langState.target].name}. Vamos a empezar.`, 'es');
   nextQuestion();
 });
 
@@ -692,22 +744,24 @@ btnStop.addEventListener('click', ()=>{
   enableButtons(false);
   btnStop.disabled = true;
   tbManual.classList.remove('show');
+  tbInput.value = '';
   setStatus('Clase terminada');
 });
 
 btnRepeat.addEventListener('click', async ()=>{
   if (!teacher.current || teacher.state === 'speaking') return;
   stopListening();
+  clearLater();
   setStatus('Repitiendo…');
   tbAvatar.classList.add('talking');
-  setLive('speak', '🔊 Profe hablando…');
-  await speakSafe(teacher.current.promptText, 'es');
+  setLive('speak', '🔊 Profesor hablando…');
+  if (teacher.current.speakPrompt) await speakSafe(teacher.current.speakPrompt, 'es');
   if (teacher.current.type === 'repite' || teacher.current.type === 'pronuncia'){
     await new Promise(r=>setTimeout(r,250));
     await speakSafe(teacher.current.expectAnswer, teacher.current.answerLang);
   }
   tbAvatar.classList.remove('talking');
-  await new Promise(r=>setTimeout(r,350));
+  await new Promise(r=>setTimeout(r,300));
   startListening();
 });
 
@@ -716,89 +770,111 @@ btnReveal.addEventListener('click', ()=>{
   tbFeedback.className = 'tb-feedback';
   tbFeedback.textContent = '';
   tbTranscript.textContent = `Respuesta correcta: "${teacher.current.expectAnswer}"`;
+  tbWord.classList.remove('hidden');
+  tbWord.textContent = teacher.current.expectAnswer;
   speakSafe(teacher.current.expectAnswer, teacher.current.answerLang);
 });
 
 btnSkip.addEventListener('click', ()=>{
   if (!teacher.current) return;
-  teacher.ko++;
-  refreshTeacherUI();
+  teacher.ko++; refreshTeacherUI();
   nextQuestion();
 });
 
 btnMic.addEventListener('click', ()=>{
   if (!teacher.active) return;
-  if (teacher.listening) stopListening();
+  if (teacher.listening){ stopListening(); }
   else startListening();
 });
 
-btnManualOK.addEventListener('click', ()=>{
+/* Enviar respuesta escrita */
+function sendTyped(){
+  const txt = tbInput.value.trim();
+  if (!txt) return;
   if (!teacher.current) return;
+  stopListening();
+  tbTranscript.textContent = `Escribiste: "${txt}"`;
+  evaluateAnswer(txt);
+  tbInput.value = '';
+}
+btnSend.addEventListener('click', sendTyped);
+tbInput.addEventListener('keydown', e=>{ if (e.key === 'Enter'){ e.preventDefault(); sendTyped(); } });
+tbInput.addEventListener('focus', ()=> stopListening());
+
+/* Botones manuales */
+btnManualOK.addEventListener('click', ()=>{
+  if (!teacher.current || teacher.feedbackPending) return;
   teacher.ok++; refreshTeacherUI();
   tbFeedback.className = 'tb-feedback ok';
   tbFeedback.textContent = '✅ Marcado como correcto';
+  teacher.feedbackPending = true;
   advanceAfterFeedback();
 });
 btnManualKO.addEventListener('click', ()=>{
-  if (!teacher.current) return;
+  if (!teacher.current || teacher.feedbackPending) return;
   teacher.ko++; refreshTeacherUI();
   tbFeedback.className = 'tb-feedback ko';
   tbFeedback.textContent = '❌ Marcado para repetir';
   tbTranscript.textContent = `Respuesta correcta: "${teacher.current.expectAnswer}"`;
+  tbWord.classList.remove('hidden');
+  tbWord.textContent = teacher.current.expectAnswer;
   speakSafe(teacher.current.expectAnswer, teacher.current.answerLang);
+  teacher.feedbackPending = true;
   advanceAfterFeedback();
 });
 
 function advanceAfterFeedback(){
   stopListening();
-  later(()=>{ if (teacher.active) nextQuestion(); }, 2200);
+  later(()=>{ if (teacher.active){ teacher.feedbackPending = false; nextQuestion(); } }, 2400);
 }
 
-/* --- Siguiente pregunta --- */
+/* --------- Siguiente pregunta --------- */
 async function nextQuestion(){
   if (!teacher.active) return;
   if (teacher.round >= teacher.maxRound){ endClass(); return; }
   clearLater();
   stopListening();
-  
+
   teacher.round++;
   refreshTeacherUI();
   teacher.current = buildQuestion();
   teacher.state = 'speaking';
+  teacher.feedbackPending = false;
   tbFeedback.className = 'tb-feedback';
   tbFeedback.textContent = '';
   tbTranscript.textContent = '…';
-  tbQLang.textContent = LANGS[langState.target].name;
-  tbQuestion.textContent = teacher.current.promptText;
+  tbQLang.textContent = teacher.current.promptLabel;
+  tbPrompt.textContent = teacher.current.promptText;
+  tbWord.style.display = '';
+  tbWord.classList.remove('hidden');
+  tbWord.textContent = teacher.current.wordShown;
+  tbSub.textContent = `Ronda ${teacher.round} de ${teacher.maxRound}`;
   setStatus('Pregunta ' + teacher.round);
   tbAvatar.classList.add('talking');
-  setLive('speak', '🔊 Profe hablando…');
+  setLive('speak', '🔊 Profesor hablando…');
   tbManual.classList.remove('show');
+  tbInput.value = '';
 
-  // 1) Pregunta principal (siempre en español para que el alumno entienda la instrucción)
-  await speakSafe(teacher.current.promptText, 'es');
-
-  // 2) Si es repetición/pronunciación, la profe da el modelo
+  if (teacher.current.speakPrompt) await speakSafe(teacher.current.speakPrompt, 'es');
   if (teacher.current.type === 'repite' || teacher.current.type === 'pronuncia'){
-    await new Promise(r=>setTimeout(r, 300));
-    setLive('speak', '🔊 Escucha el modelo…');
+    await new Promise(r=>setTimeout(r, 250));
+    setLive('speak', '🔊 Modelo en ' + LANGS[teacher.current.answerLang].name + '…');
     await speakSafe(teacher.current.expectAnswer, teacher.current.answerLang);
   }
-
   tbAvatar.classList.remove('talking');
+  await new Promise(r=>setTimeout(r, 350));
 
-  // 3) Ahora sí, escuchar
-  await new Promise(r=>setTimeout(r, 400));
   startListening();
 }
 
-/* --- Terminar --- */
 function endClass(){
   teacher.active = false;
   stopListening();
   clearLater();
   const total = teacher.ok + teacher.ko;
-  tbQuestion.textContent = '¡Clase terminada! 🎉';
+  tbPrompt.textContent = '¡Clase terminada! 🎉';
+  tbWord.style.display = 'none';
+  tbSub.textContent = '';
   tbFeedback.className = 'tb-feedback ok';
   tbFeedback.textContent = `Puntaje: ${teacher.ok} / ${total}`;
   setStatus('Clase finalizada');
@@ -810,7 +886,7 @@ function endClass(){
   tbManual.classList.remove('show');
 }
 
-/* --- Evaluar respuesta --- */
+/* --------- Evaluar --------- */
 function evaluateAnswer(spoken){
   if (!teacher.current) return;
   stopListening();
@@ -818,29 +894,39 @@ function evaluateAnswer(spoken){
   const expected = teacher.current.expectAnswer;
   const sim = similarity(spoken, expected);
   let color, feedback;
-  if (sim >= 0.85){ teacher.ok++; color='ok'; feedback = `✅ ¡Excelente! "${expected}"`; speakSafe(pick(['¡Muy bien!','¡Perfecto!','¡Correcto!','¡Excelente!']), 'es'); }
-  else if (sim >= 0.6){ teacher.ok++; color='partial'; feedback = `🟡 Casi. Escuché "${spoken}", era "${expected}"`; speakSafe(`Casi. La respuesta correcta es ${expected}`, 'es'); }
-  else { teacher.ko++; color='ko'; feedback = `❌ Era "${expected}". Dijiste "${spoken}"`; speakSafe(`No exactamente. La respuesta correcta es ${expected}`, 'es'); }
+  if (sim >= 0.85){
+    teacher.ok++; color='ok';
+    feedback = `✅ ¡Excelente! Era "${expected}"`;
+    speakSafe(pick(['¡Muy bien!','¡Perfecto!','¡Correcto!','¡Excelente!']), 'es');
+  } else if (sim >= 0.6){
+    teacher.ok++; color='partial';
+    feedback = `🟡 Casi. Escuché "${spoken}", era "${expected}"`;
+    speakSafe(`Casi. La respuesta correcta es ${expected}`, 'es');
+  } else {
+    teacher.ko++; color='ko';
+    feedback = `❌ Era "${expected}". Escuché "${spoken}"`;
+    speakSafe(`No exactamente. La respuesta correcta es ${expected}`, 'es');
+  }
   tbFeedback.className = 'tb-feedback ' + color;
   tbFeedback.textContent = feedback;
+  tbWord.classList.remove('hidden');
+  tbWord.textContent = expected;
   refreshTeacherUI();
   setStatus(color==='ok'?'✅ Acierto':(color==='ko'?'❌ Fallo':'🟡 Casi'));
+  teacher.feedbackPending = true;
   advanceAfterFeedback();
 }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-/* --- Abrir/cerrar panel --- */
+/* --------- Abrir/cerrar --------- */
 document.getElementById('openTeacher').addEventListener('click', ()=>{ teacherBar.classList.toggle('open'); });
-
-/* --- Atajos --- */
 window.addEventListener('keydown', e=>{
   if (!teacherBar.classList.contains('open')) return;
   if (e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
-  if (e.key==='Enter' && teacher.active && teacher.state === 'listening'){ e.preventDefault(); startListening(); }
   if (e.key==='Escape' && !teacher.active) teacherBar.classList.remove('open');
 });
 
-/* --- Init --- */
+/* --------- Init --------- */
 renderTab();
 refreshProgressUI();
 if ('speechSynthesis' in window){ speechSynthesis.getVoices(); }

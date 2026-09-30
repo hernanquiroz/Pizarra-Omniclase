@@ -158,6 +158,10 @@
   }
   #lockScreen.on{display:flex;}
   #lockScreen div{max-width:520px;line-height:1.6;}
+  #lockScreen button{
+    margin-top:16px;padding:10px 22px;font-size:var(--fs-ui);
+    background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer;
+  }
 
   @media (max-width:640px){
     #toolbar{gap:3px;padding:4px;}
@@ -261,31 +265,29 @@
 <div id="status">Listo · Pizarra OmniClase</div>
 <div id="transcript"><h4>Transcripción</h4><div id="transcriptBody"></div></div>
 <input type="file" id="fileInput" accept=".json" style="display:none">
+
 <div id="lockScreen"><div>
   <h2>⚠️ Contenido protegido</h2>
   <p>Se ha detectado una herramienta de inspección abierta. Cierra las herramientas de desarrollador para continuar usando <b>OmniClase</b>.</p>
-  <p style="opacity:.6;margin-top:12px;font-size:.85em">© OmniClase · Todos los derechos reservados</p>
+  <p style="opacity:.7;margin-top:8px;font-size:.9em">Si esto es un error, pulsa el botón o presiona <b>Esc</b>.</p>
+  <button id="unlockBtn">Desbloquear manualmente</button>
+  <p style="opacity:.6;margin-top:20px;font-size:.85em">© OmniClase · Todos los derechos reservados</p>
 </div></div>
 
 <script>
 /* =============================================================
    © OMNICLASE — Todos los derechos reservados
-   Reproducción, copia o redistribución no autorizada prohibida.
    ============================================================= */
 (function(){
 'use strict';
 
 /* ============================================================
    ⚙️  CONFIGURACIÓN DE PROTECCIÓN
-   ============================================================
-   ✅ El bloqueo por dominio está DESACTIVADO.
-   ✅ Funciona en cualquier hosting: GitHub Pages, Netlify,
-      Vercel, dominio propio, local, file://, etc.
    ============================================================ */
-const DOMINIOS_AUTORIZADOS = []; // vacío = sin restricción
+const DOMINIOS_AUTORIZADOS = [];  // vacío = sin restricción de dominio
 
 const BLOQUEAR_CLIC_DERECHO = true;
-const BLOQUEAR_DEVTOOLS      = true;
+const BLOQUEAR_DEVTOOLS      = true;   // ahora con detección corregida
 const BLOQUEAR_ATAJOS        = true;
 const MOSTRAR_MARCA_AGUA     = true;
 
@@ -346,27 +348,72 @@ if (BLOQUEAR_ATAJOS){
 }
 
 /* ============================================================
-   DETECCIÓN DE DEVTOOLS
+   DETECCIÓN DE DEVTOOLS — VERSIÓN CORREGIDA
+   ------------------------------------------------------------
+   Problema anterior: usaba solo outerWidth-innerWidth que da
+   falsos positivos en GitHub Pages, móviles, iframes y zoom.
+   
+   Solución:
+   - Solo se activa en navegadores de escritorio reales
+   - Requiere que AMBAS dimensiones sean sospechosas a la vez
+   - Ignora móviles y tablets (touch)
+   - Ignora si la página está en un iframe
+   - Requiere 3 detecciones consecutivas para bloquear
+   - Botón + tecla Esc para desbloquear manualmente
    ============================================================ */
 if (BLOQUEAR_DEVTOOLS){
   const lockScreen = document.getElementById('lockScreen');
-  let devtoolsOpen = false;
-  const umbral = 160;
+  const unlockBtn  = document.getElementById('unlockBtn');
 
-  const check = () => {
-    const wDelta = window.outerWidth - window.innerWidth;
-    const hDelta = window.outerHeight - window.innerHeight;
-    const sospechoso = wDelta > umbral || hDelta > umbral;
-    if (sospechoso !== devtoolsOpen){
-      devtoolsOpen = sospechoso;
-      lockScreen.classList.toggle('on', devtoolsOpen);
+  // Si es móvil/tablet o estamos en iframe → no hacer detección
+  const esMovil = /Mobi|Android|iPhone|iPad|iPod|Tablet/i.test(navigator.userAgent)
+                  || ('ontouchstart' in window && navigator.maxTouchPoints > 1);
+  const enIframe = window.self !== window.top;
+  const desbloqueadoManual = { valor:false };
+
+  // Botón de desbloqueo manual
+  unlockBtn.addEventListener('click', () => {
+    desbloqueadoManual.valor = true;
+    lockScreen.classList.remove('on');
+  });
+  // Tecla Esc para desbloquear
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && lockScreen.classList.contains('on')){
+      desbloqueadoManual.valor = true;
+      lockScreen.classList.remove('on');
     }
-  };
-  setInterval(check, 900);
+  });
 
+  if (!esMovil && !enIframe){
+    let contadorSospechoso = 0;
+    const check = () => {
+      if (desbloqueadoManual.valor) return;
+
+      const wDelta = window.outerWidth  - window.innerWidth;
+      const hDelta = window.outerHeight - window.innerHeight;
+
+      // Umbral alto + AMBAS dimensiones deben superarlo
+      const umbral = 250;
+      const sospechoso = wDelta > umbral && hDelta > umbral;
+
+      if (sospechoso){
+        contadorSospechoso++;
+        // Requiere 3 detecciones seguidas (~4.5s) para bloquear
+        if (contadorSospechoso >= 3){
+          lockScreen.classList.add('on');
+        }
+      } else {
+        contadorSospechoso = 0;
+        lockScreen.classList.remove('on');
+      }
+    };
+    setInterval(check, 1500);
+  }
+
+  // Trampa para quien intente imprimir en consola
   const trampa = /./;
   trampa.toString = function(){
-    lockScreen.classList.add('on');
+    if (!desbloqueadoManual.valor) lockScreen.classList.add('on');
     return '';
   };
   try { console.log('%c', trampa); } catch(e){}
